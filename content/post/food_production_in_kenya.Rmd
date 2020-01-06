@@ -1,0 +1,111 @@
+---
+title: "Food Production in Kenya"
+author: "Florence Muriuki"
+date: "2019-07-21"
+output: html_document
+---
+
+
+*The purpose of this project is to showcase use of R shiny in creating simple interactive dashboards. I decided 
+to use food production dataset because in future I would like to dig deeper into why we experience food shortages 
+in some parts of Kenya.*
+
+
+We all have our favourite foods. Some people can't wait for their favourite fruit season and 
+are willing to pay exorbitant amounts during the off season. In the recent past, there has been 
+a craze around avocadoes to an extent that avocadoes sold at above Ksh 40  a piece in some parts of Nairobi. Using data from [AFA](https://www.agricultureauthority.go.ke/?page_id=976), I looked at 
+avocado production within the country between 2012 and 2017. Please note that data from 2015 is missing.
+
+
+```{r, include = F}
+library(ggplot2)
+library(ggmap)
+library(plotly)
+```
+
+```{r, include = F}
+food = readRDS("Food/Cleaned-Data/food_production_2012_2017.rds")
+county_shapefiles = readRDS("Food/Cleaned-Data/county_shapefiles.rds")
+
+```
+
+```{r, include = F}
+avocadoes = food %>%
+  dplyr::filter(crop_type == "Avocadoes") %>%
+  group_by(year) %>%
+  summarise(produce = sum(volume_in_mt), area = sum(area_in_ha))
+
+```
+
+### Trend in Avocado Production 
+```{r, echo = F, fig.width = 12, fig.height = 6}
+g <- ggplot(avocadoes, aes(x = year, y = produce)) + geom_line(lwd = 2, col = "#006400") +            
+        ggtitle(label = paste("Avocadoes Annual Produce in Tonnes")) +
+        theme(axis.ticks = element_blank(), 
+              axis.title = element_blank(),
+              axis.text = element_text(size = 14,colour = "#006400"), 
+              plot.title = element_text(size = 16, colour = "#006400", face = "bold")) + 
+        scale_x_continuous(breaks = seq(min(avocadoes$year, na.rm = T), max(avocadoes$year, na.rm = T), 1),
+                           labels = seq(min(avocadoes$year, na.rm = T), max(avocadoes$year, na.rm = T), 1)) +
+        scale_y_continuous(labels = scales::comma)
+ggplotly(g)
+
+```
+
+Avocadoes production has been rising since 2012 and the growth is likely to continue due to increased local and export market.
+
+
+```{r, echo = F}
+counties = food %>%
+  dplyr::filter(crop_type == "Avocadoes", year == 2017)
+```
+
+```{r, echo = F, fig.width = 6, fig.height = 6 }
+
+county_shapefiles1 <- county_shapefiles %>%
+        dplyr::left_join(counties, by = "county") %>%
+        dplyr::rename("produce" = volume_in_mt)
+
+g <- ggplot(county_shapefiles1, aes(x = long, y = lat, group = group, label = county)) +
+  geom_polygon(aes(fill = produce)) +
+  theme_classic() + theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(), 
+    axis.title = element_blank(),
+    axis.line = element_blank(),
+    plot.title = element_text(size = 16, colour = "#006400", face = "bold")) +
+   guides(fill = guide_legend(title = "Produce")) +
+  ggtitle(label = paste("Avocadoes Production in Tonnes at County Level")) +
+  scale_fill_gradient(low = "#7CFC00", high = "#006400")
+ggplotly(g) 
+ 
+
+```
+*The darker the shade, the higher the produce.*
+
+ 
+ As of 2017, Murang'a was the leading producer of avocadoes.
+ 
+ To see trends for other crops and what each county is producing, visit [food production dashboard](https://florence.shinyapps.io/food_production/.)
+ 
+ 
+ 
+ Data and code is [here](https://github.com/florencewambui/food_in_kenya)
+ 
+ Data source: [AFA](https://www.agricultureauthority.go.ke/?page_id=976)
+ 
+ Other references: 
+
+ * [Standard Media](https://www.standardmedia.co.ke/article/2001326301/china-s-avocado-export-boom)
+ 
+ * [Business Daily](https://www.businessdailyafrica.com/news/Avocado-exports-banned-as-price-rises/539546-4272600-9gthm2z/index.html)
+
+Tools: 
+
+* [Tabula](https://tabula.technology/) for data tables extraction from pdfs
+
+* [R](https://www.r-project.org/)
+
+       
+       
+
