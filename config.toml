@@ -1,6 +1,6 @@
 baseurl = "/"
 languageCode = "en-us"
-title = "Blackburn Theme Demo"
+title = "Wambui Muriuki"
 theme = "blackburn"
 author = "Yoshiharu Yamashita"
 copyright = "&copy; 2016. All rights reserved."
@@ -15,10 +15,10 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
   # Shown in the home page
-  subtitle = "A Hugo Theme"
-  brand = "Blackburn"
-  googleAnalytics = "Your Google Analytics tracking ID"
-  disqus = "Your Disqus shortname"
+  subtitle = "Random stories with bits of code and data"
+  brand = "Wambui"
+  #googleAnalytics = "Your Google Analytics tracking ID"
+  #disqus = "Your Disqus shortname"
   # CSS name for highlight.js
   highlightjs = "androidstudio"
   dateFormat = "02 Jan 2006, 15:04"
@@ -52,9 +52,9 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [social]
   # Link your social networking accouns to the side menu
   # by entering your username or ID.
-  twitter = "*"
-  facebook = "*"
-  instagram = "*"
-  github = "yoshiharuyamashita"
-  stackoverflow = "*"
-  linkedin = "*"
+  #twitter = "*"
+  #facebook = "*"
+  #instagram = "*"
+  github = "florencewambui"
+  #stackoverflow = "*"
+  linkedin = "https://www.linkedin.com/in/florence-muriuki-57239a143/"
