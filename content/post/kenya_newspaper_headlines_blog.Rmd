@@ -1,0 +1,417 @@
+---
+title: "Past 10 years in headlines: Uhuru's Friends and Enemies, Corruption Web"
+author: "Florence Muriuki"
+date: "2019-09-20"
+output: html_document
+---
+In the information age, we have access to almost every piece of information imaginable in a matter of seconds. However,
+at any given moment, we only need very specific and negligible portions. A good example is when we are reading/watching news,
+we are only interested in particular segments and particular details from those segments. For some it's sports and within the sports category, some people will pick up information only on  football matches whilst others on athletes. 
+
+Beyond our individual information consumption patterns, organizations may need to answer particular questions from huge bodies of text. It 
+could be doctors combing through years of research to identify amongst other things: symptoms, experiments, cures and central persons in 
+the management of a given condition. It could be lawyers perusing through collections of precedents. It could be customer service agents identifying their most disgruntled customers from various streams of feedback - emails, social media comments etc. Or it could be us today, figuring out the following:
+
+1. The topics that dominated local dailies in the past 10 years
+
+2. Media coverage given to Uhuru, Ruto and Raila in the past 10 years
+
+3. The public friends and enemies of President Uhuru in the past 10 years
+
+4. The persons who have been at the center of the corruption nightmare plaguing Kenya
+
+Let's get started.
+
+### Data collection and cleaning
+
+From https://archive.org/web/, we extract daily nation, standard, business daily and star headlines posted on the front pages of each of the aforementioned media outlets. The script to scrape the headlines is [here](https://github.com/florencewambui/Kenya-Newspaper-Headlines/blob/master/Scripts/scraping_newspaper_headlines_2019.R).
+
+The combined and cleaned data looks likes this:
+```{r, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+library(gridExtra)
+library(zoo)
+library(tm)
+library(igraph)
+library(splitstackshape)
+library(ggraph)
+library(tidygraph)
+library(networkD3)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+news = readRDS("Kenyan-Newspaper-Headlines/Cleaned-Data/headlines.rds") 
+#news$headline1 = str_replace(news$headline, "[^A-Za-z1-9\\s+\\.,\\?:;-]", "'")
+print(head(news))
+print(paste("Earliest date:", min(news$date)))
+print(paste("Latest date:", max(news$date)))      
+
+```
+
+
+We have headlines from October 2008 upto August 2019.
+
+### Topic Modelling
+Topic modelling is the process of identifying the main subjects covered by body/bodies of text. Think of it as summarizing a book by identifying and grouping the recurring words and characters.
+
+
+A simple LDA topic model reveals three major topics covered by the scraped headlines as shown on the left side of the figure below. The LDA code is [here](https://github.com/florencewambui/Kenya-Newspaper-Headlines/blob/master/Scripts/topic_modelling.ipynb).
+
+Uhuru, market, police, raila, ruto, bank, court and tax are some of the words that dominated the headlines as shown on the right side of the plot below. 
+
+![](/post/kenya_newspaper_headlines_blog_files/topics_vis.PNG){width=800px height=500px}
+
+Let's take a look at the three topics:
+
+
+##### Topic 1: Economy and business news
+
+We can call the first topic "Economy and business" as it contains key words such as market, bank, company, firm, deal, tax, price, cash, power and billion. This topic can be attributed mainly to Business Daily headlines. 
+
+![](/post/kenya_newspaper_headlines_blog_files/topic1.PNG){width=600px height=500px}
+
+##### Topic 2: Crimes
+
+The second topic covers general stories especially crimes as illustrated by words such as death, murder, police, attack and kill.
+
+![](/post/kenya_newspaper_headlines_blog_files/topic2.PNG){width=600px height=500px}
+
+
+##### Topic 3: Politics
+Topic 3 is dominated by politicians and political organizations such as uhuru, ruto, raila, governors and  jubilee party. We also see words such as health, teachers, poll, graft and court that tie political entities to issues that affected the country significantly in the past 10 years.
+
+![](/post/kenya_newspaper_headlines_blog_files/topic3.PNG){width=600px height=500px}
+
+In the remaining section, we delve deeper into topic 3.
+
+### Media coverage of Uhuru, Raila and Ruto
+
+Let's us explore topic 3 (Politics) a little further. As the top political personalities in the country, 
+Uhuru, Raila and Ruto dominated the headlines. Let us see how the media covered each of the 3 individuals in the past 10 years.
+
+
+```{r, include=FALSE}
+politics = news %>%
+  mutate(uhuru = grepl(paste(c("uhuru", "kenyatta", "uhuruto", "tna", "jubilee"), collapse = "|"), headline,           ignore.case = T),
+         raila = grepl(paste(c("raila", "odinga", "agwambo", "nasa", "odm", " cord "), collapse = "|"),                headline, ignore.case = T),
+         ruto  = grepl(paste(c("ruto", " urp ", "jubilee"), collapse = "|"),  headline, ignore.case = T)
+         ) %>%
+  filter(uhuru == TRUE | raila == TRUE |ruto == TRUE)
+
+politics$uhuru = if_else(grepl(paste(c("uhuru park", "jomo", "mzee", "uhuru garden", "kenyatta university", "jomo kenyatta university", "kenyatta hospital", "insurance", " kin ", "cousin", "relative"), collapse = "|"), 
+politics$headline, ignore.case = T), FALSE, politics$uhuru)
+```
+
+
+
+```{r, include =FALSE}
+politics_personalities = politics %>%
+  mutate(uhuru = grepl(paste(c("uhuru", "kenyatta", "uhuruto"), collapse = "|"), headline, ignore.case = T),
+         raila = grepl(paste(c("raila", "odinga", "agwambo"), collapse = "|"), headline, ignore.case = T),
+         ruto  = grepl("ruto",  headline, ignore.case = T)
+         ) %>%
+  filter(uhuru == TRUE | raila == TRUE |ruto == TRUE)
+
+```
+
+
+```{r, echo = FALSE}
+interests = c("uhuru", "raila", "ruto")
+yearly_mentions = politics%>%
+  group_by(year(date)) %>%
+  summarise_at(.vars = interests, .funs = sum) %>%
+  ungroup() %>%
+  rename("year" = `year(date)`) 
+
+
+yearly_mentions = yearly_mentions %>%
+  select(year, uhuru, raila, ruto) %>%
+  gather("person", "mentions", - year)
+  
+yearly_mentions$person = as.factor(yearly_mentions$person)
+
+upper_limit = max(yearly_mentions$mentions)
+
+g1 = ggplot(yearly_mentions, aes(x = year, y = mentions, colour = person)) +
+  geom_line(lwd = 1.5) +
+  ggtitle("Politics: Uhuru, Jubilee, TNA, Raila, ODM, NASA, Ruto, urp") +
+  scale_x_continuous(breaks = seq(2008, 2019, 1), labels = seq(2008, 2019, 1)) +
+  theme(axis.ticks = element_blank(), axis.title.x = element_blank(), axis.text.x = element_text(angle = 90)) +
+  scale_colour_manual(values = c("uhuru" = "#E81D26", "raila" = "#F7D133", "ruto" = "#216ab2"))
+
+```
+
+
+
+
+```{r, echo = FALSE}
+interests = c("uhuru", "raila", "ruto")
+yearly_mentions = politics_personalities%>%
+  group_by(year(date)) %>%
+  summarise_at(.vars = interests, .funs = sum) %>%
+  ungroup() %>%
+  rename("year" = `year(date)`) 
+
+
+yearly_mentions = yearly_mentions %>%
+  select(year, uhuru, raila, ruto) %>%
+  gather("person", "mentions", - year)
+  
+yearly_mentions$person = as.factor(yearly_mentions$person)
+
+g2 = ggplot(yearly_mentions, aes(x = year, y = mentions, colour = person)) +
+  geom_line(lwd = 1.5) +
+  ggtitle("Political Personalities: Uhuru,Raila, Ruto") +
+  scale_x_continuous(breaks = seq(2008, 2019, 1), labels = seq(2008, 2019, 1)) +
+  theme(axis.ticks = element_blank(), axis.title.x = element_blank(), axis.text.x = element_text(angle = 90)) +
+  ylim(c(0, upper_limit)) +
+  scale_colour_manual(values = c("uhuru" = "#E81D26", "raila" = "#F7D133", "ruto" = "#216ab2"))
+```
+
+
+
+```{r, echo = F}
+grid.arrange(g1, g2, nrow = 2)
+```
+
+The three politicians started from a fairly level ground in 2008/2009 when Raila Odinga was the prime minister and Uhuru Kenyatta was the finance minister. Around 2011, as the 2013 elections neared, the media 
+increased the coverage of the three with Raila getting more attention. This could be because he held a higher position in the government as the prime minister and he had been in the spotlight earlier during the referendum. 
+
+From 2012, Uhuru  and Ruto gained more attention from the media due to the coverage of the ICC cases against them.Between 2013 and 2016, Uhuru's spotlight outshone the others due to his presidential position. In this period, Ruto and Raila were receiving almost equal coverage. 
+
+In 2016, as the 2017 elections neared, media coverage of the three spiked peaking in 2017. Notice how when the coverage includes political parties, Raila outshone the others in 2017. After the 2017 elections, the media gradually withdrew its attention from the three.
+
+Towards the end of 2018 and beginning of 2019, Ruto's media coverage started levelling off as the others' continued dipping. Let us zoom into the post 2017 election.
+
+
+#### The fading star of Raila and growing star of Ruto
+
+
+```{r, echo = F}
+recent_politics = politics_personalities %>%
+  filter(year(date) > 2017)
+
+recent_politics$year_month = factor(as.yearmon(recent_politics$date))
+monthly_mentions = recent_politics %>%
+ group_by(year_month) %>%
+ summarise_at(.vars = interests, .funs = sum) %>%
+ ungroup() %>%
+ gather("person", "mentions", uhuru, raila, ruto)
+
+
+ggplot(monthly_mentions, aes(x = year_month, y = person, fill = mentions)) +
+  geom_tile() +
+  theme_classic() +
+  theme(axis.ticks = element_blank(), 
+        axis.line = element_blank(), 
+        axis.text.x = element_text(angle = 90),
+        axis.title.x = element_blank()) +
+  scale_fill_gradient(low = "white", high = "blue") 
+
+```
+
+Overall, the media coverage on all the three individuals has been declining since January 2018. However, there are two significant observations:
+
+* Spike of Raila's and Uhuru's coverage in the handshake month of March 2018 with Ruto further away from the limelight
+
+* Fading of Rails's spotlight and growing of Ruto's spotlight to an extent that Ruto is almost receiving
+equal coverage as Uhuru from March 2019.
+
+
+These are just my observations. Depending on the focus of the lens and the story teller's motivation, different stories could be told from the same data. 
+
+
+### Public friends and enemies of Uhuru
+We start by subsetting the news dataset to get only the headlines that mention Uhuru. We then use named entity recognition to extract names of persons, organizations and places mentioned alongside Uhuru. 
+
+When given this statemet "Michael Jordan meets Uhuru at Kasarani Stadium", ner identifies Michael Jordan and Uhuru as persons and Kasarani Stadium as a building/related object.
+
+![](/post/kenya_newspaper_headlines_blog_files/ner.PNG)
+
+When named entity recognition is applied to our headlines, it generates results as shown below:
+
+![](/post/kenya_newspaper_headlines_blog_files/ner_functions.PNG)
+
+![](/post/kenya_newspaper_headlines_blog_files/entity_recognition1.PNG)
+
+As shown above, the results of named entity recognition are far from accurate, but they form a good skeleton for data cleaning. Alongside named entity recognition, there is parts of speech tagging which identifies whether a word is a noun, adjective etc. In the example above, I extracted nouns. The named entity recognition code is [here](https://github.com/florencewambui/Kenya-Newspaper-Headlines/blob/master/Scripts/pos_and_ner.ipynb).
+
+
+After cleaning the results of named entity recognition, we end up with data that looks like this:
+```{r, echo = F}
+uhuru_entities = read_csv("Kenyan-Newspaper-Headlines/Cleaned-Data/uhuru_entities2.csv")
+uhuru_entities$entities = gsub("\\s+", " ", uhuru_entities$entities)
+uhuru_entities$entities = gsub("[[:punct:]]$", " ", uhuru_entities$entities)
+
+head(uhuru_entities)
+```
+
+```{r, include = F}
+#uhuru_entities = uhuru_entities[year(uhuru_entities$date) == 2016,]
+
+uhuru_entities$entities = gsub(", ", ",",  uhuru_entities$entities)
+uhuru_entities$entities = gsub(" ", "_",  uhuru_entities$entities)
+uhuru_entities$entities = gsub(",", " ",  uhuru_entities$entities)
+
+```
+
+
+We use column entities to create a network graph that shows who were mentioned alongside Uhuru in the headlines and how frequent the mentions were. The mentions range from Uhuru mentioning someone, another person such as Raila mentioning Uhuru, a columnist writing an article about Uhuru etc. The network graph below shows the entities which were most frequently mentioned alongside Uhuru in the headlines.
+
+
+
+
+```{r, echo = F, fig.width = 12, fig.height = 8}
+corpus = VCorpus(VectorSource(uhuru_entities$entities))
+corpus = tm_map(corpus, content_transformer(tolower))
+tdm = TermDocumentMatrix(corpus, control = list(removePunctuation = FALSE, stopwords = FALSE))
+areas_matrix = as.matrix(tdm)
+areas_matrix[areas_matrix >= 1] = 1
+adjacency_matrix = areas_matrix %*% t(areas_matrix)
+graph_object = graph.adjacency(adjacency_matrix, weighted = TRUE, mode = "undirect")
+graph_object = simplify(graph_object)
+bipartite_object = get.data.frame(graph_object) %>% 
+  filter(from == "uhuru" | to == "uhuru", weight >= 15) 
+  
+graph_object = graph.data.frame(bipartite_object)
+V(graph_object)$label = V(graph_object)$name
+V(graph_object)$degree = degree(graph_object)
+nodes = data.frame(table(unlist(strsplit(uhuru_entities$entities, " "))))
+colnames(nodes) = c("label", "mentions")
+nodes$log_mentions = log(nodes$mentions)
+nodes = nodes[nodes$label %in% V(graph_object)$label,]
+nodes = nodes %>% arrange(label)
+
+tidy_graph_object = as_tbl_graph(graph_object) 
+tidy_graph_object = tidy_graph_object %>%
+   arrange(label)
+V(tidy_graph_object)$counts = nodes$mentions
+ggraph(tidy_graph_object, layout = "nicely") + geom_edge_link(aes(edge_width = weight),edge_colour = "blue") +
+    geom_node_point(aes(size = V(tidy_graph_object)$counts), col = "red") +         theme_graph() +
+    geom_node_text(aes(label = label), repel = TRUE) +
+    scale_size(range = c(0.5, 15)) + theme(legend.position = "none")
+```
+
+
+
+```{r, eval = F, include = F}
+corpus = VCorpus(VectorSource(uhuru_entities$entities))
+corpus = tm_map(corpus, content_transformer(tolower))
+tdm = TermDocumentMatrix(corpus, control = list(removePunctuation = FALSE, stopwords = FALSE))
+entities_matrix = as.matrix(tdm)
+entities_matrix[entities_matrix >= 1] = 1
+adjacency_matrix = entities_matrix %*% t(entities_matrix)
+graph_object = graph.adjacency(adjacency_matrix, weighted = TRUE, mode = "undirect")
+graph_object = simplify(graph_object)
+bipartite_object = get.data.frame(graph_object) 
+edge_list = bipartite_object %>% select(to, from)
+nodes = data.frame(table(unlist(strsplit(uhuru_entities$entities, " ")))) %>%
+  rowid_to_column("id")
+colnames(nodes) = c("id", "label", "weight")
+
+edges = bipartite_object 
+edges = edges %>%
+  left_join(nodes %>% select(-weight), by = c("from" = "label")) %>%
+  select(-from) %>%
+  rename("from" = id) %>%
+  left_join(nodes %>% select(-weight), by = c("to" = "label")) %>%
+  select(-to) %>%
+  rename("to" = id)
+
+nodes_d3 = nodes %>%
+  mutate(id = id - 1)
+
+edges_d3 = edges %>%
+  mutate(from = from - 1, to = to - 1)
+
+plot = forceNetwork(Links = edges_d3, Nodes = nodes_d3, Source = "from", Target = "to", 
+             NodeID = "label", Nodesize = "weight", Group = "id", Value = "weight", 
+             opacity = 1, fontSize = 16, zoom = TRUE)
+
+source("custom_js.R")
+
+htmlwidgets::onRender(plot, customJS)
+
+```
+
+
+### The corruption web
+As we did in the previous section, we can get headlines that mention graft and other related terms such as corruption, steal etc. Thereafter, we can apply named entity recognition on the graft related headlines to identify persons and organizations are mentioned in these headlines.
+
+The cleaned graft-related data looks as follows:
+```{r, echo = F, warning=F, message = F}
+corruption_entities = read_csv("Kenyan-Newspaper-Headlines/Cleaned-Data/corruption_entities2.csv")
+corruption_entities$entities = gsub("\\s+", " ", corruption_entities$entities)
+corruption_entities$entities = gsub("[[:punct:]]$", " ", corruption_entities$entities)
+head(corruption_entities %>% select(-source))
+```
+
+```{r, include = F}
+corruption_entities$entities = gsub(", ", ",", corruption_entities$entities)
+corruption_entities$entities = trimws(corruption_entities$entities, "both")
+corruption_entities$entities = gsub(" ", "_",  corruption_entities$entities)
+corruption_entities$entities = gsub(",", " ",  corruption_entities$entities)
+
+
+```
+
+
+Using this data, particularly column "entities", we create a network graph that show the persons and institutions that have been frequently mentioned in graft-related headlines in the past 10 years. The bigger the red dot, the more an entity was mentioned in the graft-related headlines. 
+
+
+
+```{r, echo = F, fig.width = 12, fig.height = 8}
+corpus = VCorpus(VectorSource(corruption_entities$entities))
+corpus = tm_map(corpus, content_transformer(tolower))
+tdm = TermDocumentMatrix(corpus, control = list(removePunctuation = FALSE, stopwords = FALSE))
+areas_matrix = as.matrix(tdm)
+areas_matrix[areas_matrix >= 1] = 1
+adjacency_matrix = areas_matrix %*% t(areas_matrix)
+graph_object = graph.adjacency(adjacency_matrix, weighted = TRUE, mode = "undirect")
+graph_object = simplify(graph_object)
+bipartite_object = get.data.frame(graph_object) %>% 
+  filter(weight >= 2)
+graph_object = graph.data.frame(bipartite_object)
+V(graph_object)$label = V(graph_object)$name
+V(graph_object)$degree = degree(graph_object)
+nodes = data.frame(table(unlist(strsplit(corruption_entities$entities, " "))))
+colnames(nodes) = c("label", "mentions")
+nodes$log_mentions = log(nodes$mentions)
+nodes = nodes[nodes$label %in% V(graph_object)$label,]
+nodes = nodes %>% arrange(label)
+tidy_graph_object = as_tbl_graph(graph_object) 
+tidy_graph_object = tidy_graph_object %>%
+   arrange(label)
+V(tidy_graph_object)$counts = nodes$mentions
+ggraph(tidy_graph_object, layout = "nicely") + geom_edge_link(aes(edge_width = weight),edge_colour = "blue") +
+    geom_node_point(aes(size = V(tidy_graph_object)$counts), col = "red") +         theme_graph() +
+    geom_node_text(aes(label = label), repel = TRUE) +
+    scale_size(range = c(0.5, 15)) + theme(legend.position = "none")
+```
+At the center of the graph, we see EACC and Uhuru as the main characters in the Kenyan corruption story alongside Raila and parliament. Here, we do not assess who are the proponents and opponents of corruption. We focus on the characters and not the roles of the characters.
+
+
+
+
+
+
+Data source: [Wayback Machine](https://archive.org/web/)
+
+References: 
+
+ * https://towardsdatascience.com/topic-modeling-and-latent-dirichlet-allocation-in-python-9bf156893c24
+ 
+ * https://www.machinelearningplus.com/nlp/topic-modeling-gensim-python/
+ 
+Tools: R, Python, Excel
+
+Data and scripts repository: https://github.com/florencewambui/Kenya-Newspaper-Headlines
+
+
+
+
+
+
