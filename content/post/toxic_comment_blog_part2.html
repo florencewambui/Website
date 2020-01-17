@@ -1,0 +1,33 @@
+---
+title: Flagging Toxic Comments Part 2
+author: ''
+date: '2020-01-16'
+slug: toxic_comment_blog_part2
+categories:
+  - Machine Learning
+tags: []
+description: ''
+topics: []
+---
+
+
+
+<p>In the [previous] post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.</p>
+<div id="feature-1-length-of-comments" class="section level5">
+<h5>Feature 1: Length of comments</h5>
+<p>We would expect that harmful comments would be, on average, shorter than clean comments as clean comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</p>
+<p>Mathematics of Logistic Regression</p>
+<p>Say you wanted to predict the weight of individuals using their height, then you could use a basic equation of linear regression:</p>
+<pre><code>      yI = B + B1Xi where yi is the weight ofindividual i, Xi is the height of individual i, Bo is the intercept (average height) and B1 represents a value such that when height increases by that value, weight increases by that value too.
+      </code></pre>
+<p>In our harmful comment classification case, we only have two possible predictions - 1 and 0 thus the above equation would not well as it would result into figures beyond our preferred range. We transform the equation to give us yi between 0 and 1 as follows:</p>
+<pre><code>      P(y=1)/P(y=0) is called an odds ratio. The higher it is, the higher the probability that yi belongs to class 1. As probabilities are always between 0 and 1, the odd ratio will have values between 0 and positive infinity. 
+      
+      log(P(y = 1)/P(Y = 0)) transform the odd ratio to fit between 0 and 1.
+      </code></pre>
+<p>Based on the this knowledge, we transorm our linear equation as follow:</p>
+<p>References:</p>
+<ul>
+<li>Building Machine Learning Systems with Python by Willi Richerto and Luis Pedro Cooelho Chapter 5</li>
+</ul>
+</div>

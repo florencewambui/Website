@@ -1,0 +1,39 @@
+Objective 1: Create a model that flags harmful comments.
+
+Objective 2: Create a model that classifies harmful comments as either severe toxic, toxic, obscene, 
+insult, identity hate or threat
+
+Objective 3: Build a simple web interface that takes in comments and decides if they are harmful or not and if harmful, which category of toxicity they belong to.
+
+
+
+
+### Steps:
+
+#### 1. Explore the data
+    - Proportion of comments not associated with any level of toxicity
+    - What words are assoiated with each level of toxicity
+    - What level of toxicity implies other levels of toxicity
+    - Explore the relationship between toxicity of comments and the following:
+                 * Length of comments and repetion of words/phrases
+                 
+                 *  Special characters and punctuation in comments
+                 *  Casing of comments - use of all uppercase letters
+                 *  Presence of specific words
+                 *  Lexical features (total words, characters per word, frequency of large words and frequency                     of unique words
+                 *  Syntactic features (frequency of function words, punctuation and parts of speech tags)
+                 *  Presence of quoted words
+                 *  Presence of external links
+                 *  Sentiment analysis
+                 *  Proportion of parts of speech (especially adjectives) and presence of pronoun "you"
+
+2. Feature engineering based on step 1  
+
+3. Build a single-label classification and multilabel classification models
+
+4. Submit results
+
+5. Iterate
+
+6. Build a simple web interface that takes in comments and decides if they are toxic or not and if toxic, which category of toxicity they belong to.
+
