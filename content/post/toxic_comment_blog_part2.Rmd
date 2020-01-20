@@ -6,23 +6,328 @@ slug: toxic_comment_blog_part2
 categories:
   - Machine Learning
 tags: []
-description: ''
+description: 'Feature Engineering and Text Classification with Logistic Regression'
 topics: []
+draft: TRUE
 ---
 
 In the [previous] post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model. 
 
-##### Feature 1: Length of comments
+* To explore features, we will switch from Python to R as I prefer using R ggplot2 *
 
-We would expect that harmful comments would be, on average, shorter than clean comments as clean comments would seek to offer explanations while harmful comments would dive right into attacks. Let's take a look.
+##### Length of comments: Number of characters
+
+We would expect that harmful comments would be, on average, shorter than harmless comments as harmless comments would seek to offer explanations while harmful comments would dive right into attacks. Let's take a look.
+
+
+
+```{r loading data, include = F}
+
+train <- readRDS("Kaggle-Toxic-Comment-Challenge/Data/train.rds")
+train$comment_text = as.character(train$comment_text)
+
+```
+
+
+
+```{r, echo = FALSE}
+train$toxicity_score = rowSums(train[,3:8])
+train$harmful = as.factor(if_else(train$toxicity_score == 0, 0, 1))
+table(train$harmful)
+```
+
+```{r}
+train = train %>%
+  select(comment_text, harmful)
+
+```
+
+
+
+```{r, echo = F, fig.height = 15}
+plot_column = function(train, column_x, plot_title){
+ g1 = ggplot(train, aes_string(x = column_x)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0, 2000)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
+ 
+g2 = ggplot(train, aes_string(y = column_x, x = "harmful")) + geom_boxplot(aes(fill = harmful)) + coord_cartesian(xlim = c(0, 2000)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey")) + coord_cartesian(ylim = c(0, 2000))
+ 
+grid.arrange(g1, g2, ncol = 2)  
+  
+}
+
+```
+
+
+
+```{r, echo = F}
+
+train$length_comment = nchar(train$comment_text)
+train %>%
+  group_by(harmful) %>%
+  summarise(median_length = median(length_comment), mean_length = mean(length_comment))
+
+```
+
+Mean and median length of harmless comments are greater than those of harmful comments.
+
+
+Let's look at distribution of length of comments:
+
+
+```{r, include = F}
+plot_column = function(train, column_x, plot_title, max){
+ g1 = ggplot(train, aes_string(x = column_x)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0, max)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
+ 
+g2 = ggplot(train, aes_string(y = column_x, x = "harmful")) + geom_boxplot(aes(fill = harmful)) + coord_cartesian(xlim = c(0, 2000)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey")) + coord_cartesian(ylim = c(0, max))
+ 
+grid.arrange(g1, g2, ncol = 2)  
+  
+}
+
+```
+
+```{r, echo = F, fig.height = 4, fig.width=12}
+plot_column(train, "length_comment", "Length of Comments", 2000)
+```
+
+On average, harmful comments are shorter then harmless comments.
+
+#### Length of comments: Number of words
+
+```{r, echo = F, fig.height =5, fig.width=12}
+train$number_of_raw_words = as.vector(apply(X = train[,1, drop = F], MARGIN = 1, FUN = wordcount))
+plot_column(train, "number_of_raw_words", "Number of words", 500)
+```
+
+Similar to number of characters, number of words is lower in harmful comments.
+
+
+#### Average length of words
+We will use a simplified method to calculate the average length of words in a comment - we will include space in the number of characters.
+
+```{r, echo = F, fig.height=5, fig.width=12}
+train$average_length_of_words = train$length_comment/train$number_of_raw_words
+plot_column(train, "average_length_of_words", "Average Length of Words", 20)
+```
+
+Harmful comments use shorter words on average.
+
+
+#### Proportion of repeated words
+
+We would expect that harmless comments use repetition less than harmful comments as harmless comments are aimed at passing a message whereas harmful comments are emotional and use repetitive words for emphasis.
+
+
+
+```{r, include = F}
+english_stopwords = stopwords("english")
+
+clean_comments = function(x){
+  x = tolower(x)
+  x = gsub("[0-9]", " ", x)
+  x = gsub("\n", " ", x)
+  x = gsub("\t", " ", x)
+  x = gsub("\\s+", " ", x)
+  d = unlist(strsplit(x, " "))
+  d = d[!(d %in% english_stopwords) & nchar(d) > 2]
+  x = paste(d, collapse = " ")
+  x = gsub("[^a-z']", " ", x)
+  x = gsub("\\s+", " ", x)
+  return(x)
+}
+
+
+
+remove_repeated_words = function(x){
+  x = tolower(x)
+  x = gsub("[0-9]", " ", x)
+  x = gsub("\n", " ", x)
+  x = gsub("\t", " ", x)
+  x = gsub("\\s+", " ", x)
+  d = unlist(strsplit(x, " "))
+  d = d[!(d %in% english_stopwords) & nchar(d) > 2]
+  x = paste(unique(d), collapse = " ")
+  x = gsub("[^a-z']", " ", x)
+  x = gsub("\\s+", " ", x)
+  return(x)
+  
+}
+
+train$cleaned_comments = as.vector(apply(X = train[,1, drop = F], MARGIN = 1, FUN = clean_comments))
+
+train$unique_word_comments = as.vector(apply(X = train[,1, drop = F], MARGIN = 1, FUN = remove_repeated_words))
+
+
+train$number_words_cleaned = as.vector(apply(X = train[,6, drop = F], MARGIN = 1, FUN = wordcount))
+train$number_words_unique = as.vector(apply(X = train[,7, drop = F], MARGIN = 1, FUN = wordcount))
+train$proportion_repeated_words = 1 - train$number_words_unique/train$number_words_cleaned
+train[4,]
+
+
+```
+
+
+```{r, echo = F, fig.height=F, fig.width=12}
+plot_column(train, "proportion_repeated_words", "Proportion of Repeated Words", 1)
+
+
+```
+
+The boxplot contradicts our hypothesis that harmful comments have a higher proportion of repeated words. However, the density plot shows outliers (comments with very high proportion of repeated words) that are dominantly harmful comments. This would be representative of comments whereby the commenter dove into curse words from the first word. Let's zoom into the outliers:
+
+```{r, echo=F}
+table(Proportion_repeated_words = train$proportion_repeated_words > 0.9, Harmful = train$harmful)
+
+```
+
+
+
+```{r, echo = F, fig.height=5}
+ggplot(train, aes(x = proportion_repeated_words)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.9, 1)) + ggtitle("Proportion of Repeated Words") + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
+```
+
+A better predictor of harmful comments, in place of proportion of repeated words, an indicator variable indicating whether the proportion of repeated words is very high (higher than say 0.9).
+
+```{r, include = F}
+train$extreme_repetition = factor(if_else(train$proportion_repeated_words > 0.9, 1, 0))
+```
+
+
+#### Special characters and punctuation in comments
+
+We'ld expect that harmful comments have more special characters and punctuations such as * and exclamation marks. Let's see if the data supports this.
+
+##### Clustered exclamation marks
+
+We look at both the number of exclamation marks and the presence of a chain of exclamation marks such as !!!!!!!
+
+```{r, echo = F}
+train$number_exclamation_marks = str_count(train$comment_text, "!")
+print(tapply(train$number_exclamation_marks, train$harmful, mean))
+```
+
+Mean number of exclamation marks in harmful comments is 10 times higher than in harmless comments.
+
+
+
+```{r, echo = F}
+plot_column(train, "number_exclamation_marks", "Number of Exclamation Marks", 20)
+```
+
+
+
+```{r, echo = F}
+train$clustered_exclamation_marks = grepl("!{2,}",train$comment_text)
+round(prop.table(table(Clustered_exclamation_marks = train$clustered_exclamation_marks, Harmful = train$harmful), margin = 2),2)
+```
+
+9% of harmful comments have clustered exclamation marks as opposed to only 1% of harmless comments.
+
+
+#### Asterisks
+```{r}
+train$number_asterisks = str_count(train$comment_text, "\\*")
+train$asterisk = grepl("\\*", train$comment_text)
+round(prop.table(table(Asterisks = train$asterisk, Harmful = train$harmful), margin = 2),2)
+
+plot_column(train, "number_asterisks", "Number of Asterisks", 5)
+
+```
+
+Asterisks do not appear to be strong features of harmful comments thus we exclude them from our data.
+
+```{r}
+train = train %>% select(-number_asterisks, -asterisk)
+```
+
+
+#### Casing of comments - use of all uppercase letters
+
+We would expect that harmful comments would use more uppercase letters as an expression of emotions such as anger.
+
+##### Proportion of uppercase letters
+```{r, echo = F}
+train$proportion_uppercase_letters = str_count(train$comment_text, "[A-Z]")/
+  nchar(train$comment_text)
+plot_column(train, "proportion_uppercase_letters", "Proportion of Uppercase Letters", 1)
+
+```
+
+On average, harmful comments have a higher proportion of upper case letters according to the boxplot. From the density plot, we see the bump around 0.75 indicating a rise in proportion of upper case letters amongst harmful comments. Let us zoom into this:
+
+```{r, echo = F}
+ggplot(train, aes(x = proportion_uppercase_letters)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.7, 1)) + ggtitle("Proportion of Uppercase Letters") + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
+
+```
+
+We create a column indicating whether a comment has a very high proportion of uppercase letters.
+
+```{r, echo = F}
+train$extreme_uppercase = factor(if_else(train$proportion_uppercase_letters > 0.7, 1, 0))
+
+```
+
+
+##### Clustered uppercase letters
+```{r, echo = F}
+train$clustered_uppercase = grepl("[A-Z]{5,}", train$comment_text)
+
+round(prop.table(table(Harmful = train$harmful, clustered_uppercase = train$clustered_uppercase), margin = 1) * 100)
+```
+
+Harmful comments are 3 times more likely to have clustered (a chain of at least 5) uppercase letters as compared to harmless comments.
+
+
+#### Presence of pronoun "you"
+
+Harmful comments are likely to be targetted at specific individuals and use of "you" is a good indicator that a comment is less likely a general comment than a targetted comment.
+
+
+```{r, echo = F}
+train$you_comment_text = gsub("you're", "you are", train$comment_text, ignore.case = TRUE)
+train$presence_of_you = grepl(" you ", train$comment_text, ignore.case = TRUE)
+prop.table(table(Presence_of_you = train$presence_of_you, Harmful = train$harmful), margin = 2)
+
+```
+
+More than half (53%) of harmful comments contain the word you. Let us try the number of times you is used in a comment:
+
+
+```{r, echo = F}
+
+train$number_of_you = str_count(tolower(train$comment_text)," you ")
+
+plot_column(train, "number_of_you", "Number of pronoun 'you'", 20)
+
+
+```
+
+On average, harmful comments have a higher number of "you"s, but harmless comments dominate harmful comments particularly in the lower counts of "you". To standardize the number of you, we can calculate the proportion of you out of all the words use.
+
+```{r, echo = FALSE, fig.height = 5, fig.width = 12}
+train$proportion_of_you = train$number_of_you/train$number_of_raw_words
+plot_column(train, "proportion_of_you", "Proportion of pronoun 'you'", 0.5)
+
+
+```
+Harmful comments have higher proportions of "you".
+
+
+
+```{r}
+train1 = train %>% select(-comment_text,  -unique_word_comments, -you_comment_text)
+write.csv(train1, "train_with_features.csv", row.names = FALSE)
+```
+
+
+
+There are many other features we could create from the dataset provided, but for now let us use what we have created.
+
 
 
 
 Mathematics of Logistic Regression
 
-Say you wanted to predict the weight of individuals using their height, then you could use a basic equation of linear regression:
-
-          yI = B + B1Xi where yi is the weight ofindividual i, Xi is the height of individual i, Bo is the intercept (average height) and B1 represents a value such that when height increases by that value, weight increases by that value too.
+Logistic regression follows from linear regression, but is used for classification.
           
 In our harmful comment classification case, we only have two possible predictions - 1 and 0 thus the above equation would not well as it would result into figures beyond our preferred range. We transform the equation to give us yi between 0 and 1 as follows:
 
@@ -30,10 +335,14 @@ In our harmful comment classification case, we only have two possible prediction
           
           log(P(y = 1)/P(Y = 0)) transform the odd ratio to fit between 0 and 1.
           
-Based on the this knowledge, we transorm our linear equation as follow:
+Based on the this knowledge, we transform our linear equation as follow:
 
 
           
 References:
 
  * Building Machine Learning Systems with Python by Willi Richerto and Luis Pedro Cooelho Chapter 5 
+ 
+ * OpenIntro Statistics by David M Diez, Christopher D Barr and Mine Cetinkaya-Rundel Chapter 8
+ 
+ * [Text classification and feature union with DataFrameMapper in Python](Text classification and feature union with DataFrameMapper in Python) 

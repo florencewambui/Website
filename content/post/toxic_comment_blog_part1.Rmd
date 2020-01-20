@@ -184,7 +184,7 @@ F1 score is a composite of precision and recall therefore we also need it to inc
 Using the best parameters from the grid search results, we create our final Naive Bayes model as:
 ![](/post/toxic_comment_blog_part1_files/final naive bayes.PNG)
 
-The test data recall score improved by only 4% reaching 58%. In the next post, we will try to improve this score by using feature engineering and Logistic Regression.
+The test data recall score improved by only 4% reaching 58%. In the next post, we will try to improve this score by using feature engineering.
 
 Data source: https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data
 
