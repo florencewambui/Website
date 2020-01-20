@@ -3,17 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/</loc>
-    <lastmod>2019-09-20T00:00:00+00:00</lastmod>
+    <loc>/post/toxic_comment_blog_part2/</loc>
+    <lastmod>2020-01-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/kenya_newspaper_headlines_blog/</loc>
-    <lastmod>2019-09-20T00:00:00+00:00</lastmod>
+    <loc>/</loc>
+    <lastmod>2020-01-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
+    <lastmod>2020-01-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/toxic_comment_blog_part1/</loc>
+    <lastmod>2020-01-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/kenya_newspaper_headlines_blog/</loc>
     <lastmod>2019-09-20T00:00:00+00:00</lastmod>
   </url>
   

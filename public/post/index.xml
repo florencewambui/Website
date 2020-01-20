@@ -7,10 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 20 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 16 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Flagging Toxic Comments Part 2</title>
+      <link>/post/toxic_comment_blog_part2/</link>
+      <pubDate>Thu, 16 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/toxic_comment_blog_part2/</guid>
+      <description>In the [previous] post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.
+Feature 1: Length of commentsWe would expect that harmful comments would be, on average, shorter than clean comments as clean comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</description>
+    </item>
+    
+    <item>
+      <title>Flagging Toxic Comments Part 1</title>
+      <link>/post/toxic_comment_blog_part1/</link>
+      <pubDate>Tue, 14 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/toxic_comment_blog_part1/</guid>
+      <description>SummaryIn this post, we cover descriptions of Bayes Theorem and Naive Bayes. We thenuse Naive Bayes to classify Wikipedia comments as harmful or harmless. The model created detects 58% of harmful comments in the test data. In future posts, we improve the model by using more features and different classification models.
+IntroductionMost of us find the internet entertaining and resourceful, but sometimes we come across perjoratives in various forums.</description>
+    </item>
     
     <item>
       <title>Past 10 years in headlines: Uhuru&#39;s Friends and Enemies, Corruption Web</title>
