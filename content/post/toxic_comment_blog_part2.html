@@ -1,9 +1,8 @@
 ---
 title: "Flagging Toxic Comments Part 2"
 author: ''
-date: '2020-01-16'
-description: Feature Engineering and Text Classification with Logistic Regression
-
+date: '2020-01-18'
+description: Feature Engineering
 slug: toxic_comment_blog_part2
 tags: []
 categories: Machine Learning
@@ -53,8 +52,8 @@ new_train %&gt;%
 <pre><code>## # A tibble: 2 x 3
 ##   harmful median_length mean_length
 ##   &lt;fct&gt;           &lt;dbl&gt;       &lt;dbl&gt;
-## 1 0                 217        406.
-## 2 1                 128        308.</code></pre>
+## 1 0                 217        404.
+## 2 1                 128        301.</code></pre>
 <p>Mean and median length of harmless comments are greater than those of harmful comments.</p>
 <p>Let’s look at distribution of length of comments:</p>
 <pre class="r"><code>plot_column(new_train, &quot;length_comment&quot;, &quot;Length of Comments&quot;, 2000)</code></pre>
@@ -137,8 +136,8 @@ new_train[4,]</code></pre>
 <pre class="r"><code>table(Proportion_repeated_words = new_train$proportion_repeated_words &gt; 0.9, Harmful = new_train$harmful)</code></pre>
 <pre><code>##                          Harmful
 ## Proportion_repeated_words      0      1
-##                     FALSE 100287  11152
-##                     TRUE      40    203</code></pre>
+##                     FALSE 100281  11164
+##                     TRUE      42    191</code></pre>
 <pre class="r"><code>ggplot(new_train, aes(x = proportion_repeated_words)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.9, 1)) + ggtitle(&quot;Proportion of Repeated Words&quot;) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>A better predictor of harmful comments, in place of proportion of repeated words, an indicator variable indicating whether the proportion of repeated words is very high (higher than say 0.9).</p>
@@ -153,7 +152,7 @@ new_train[4,]</code></pre>
 <pre class="r"><code>new_train$number_exclamation_marks = str_count(new_train$comment_text, &quot;!&quot;)
 print(tapply(new_train$number_exclamation_marks, new_train$harmful, mean))</code></pre>
 <pre><code>##         0         1 
-## 0.3328118 3.4058813</code></pre>
+## 0.3230153 3.6751189</code></pre>
 <p>Mean number of exclamation marks in harmful comments is 10 times higher than in harmless comments.</p>
 <pre class="r"><code>plot_column(new_train, &quot;number_exclamation_marks&quot;, &quot;Number of Exclamation Marks&quot;, 20)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-14-1.png" width="1152" /></p>
@@ -173,8 +172,8 @@ new_train$asterisk = grepl(&quot;\\*&quot;, new_train$comment_text)
 round(prop.table(table(Asterisks = new_train$asterisk, Harmful = new_train$harmful), margin = 2),2)</code></pre>
 <pre><code>##          Harmful
 ## Asterisks    0    1
-##     FALSE 0.99 0.97
-##     TRUE  0.01 0.03</code></pre>
+##     FALSE 0.99 0.98
+##     TRUE  0.01 0.02</code></pre>
 <pre class="r"><code>plot_column(new_train, &quot;number_asterisks&quot;, &quot;Number of Asterisks&quot;, 5)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-16-1.png" width="1152" /></p>
 <p>Asterisks do not appear to be strong features of harmful comments thus we exclude them from our data.</p>
@@ -215,8 +214,8 @@ new_train$presence_of_you = grepl(&quot; you &quot;, new_train$comment_text, ign
 prop.table(table(Presence_of_you = new_train$presence_of_you, Harmful = new_train$harmful), margin = 2)</code></pre>
 <pre><code>##                Harmful
 ## Presence_of_you         0         1
-##           FALSE 0.5891252 0.4661912
-##           TRUE  0.4108748 0.5338088</code></pre>
+##           FALSE 0.5882382 0.4711217
+##           TRUE  0.4117618 0.5288783</code></pre>
 <p>More than half (53%) of harmful comments contain the word you. Let us try the number of times you is used in a comment:</p>
 <pre class="r"><code>new_train$number_of_you = str_count(tolower(new_train$comment_text),&quot; you &quot;)
 
@@ -233,4 +232,14 @@ plot_column(new_train, &quot;proportion_of_you&quot;, &quot;Proportion of pronou
 <p><img src="/post/toxic_comment_blog_part2_files/map.PNG" /></p>
 <p><img src="/post/toxic_comment_blog_part2_files/model.PNG" /></p>
 <p>The additional features improves the recall of the previous model (based on the comments only) by 2% taking the recall to 60%. In the next post, we use deep learning to further improve the recall.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://sondosatwi.wordpress.com/2017/08/01/using-text-data-and-dataframemapper-in-python/">Text classification and feature union with DataFrameMapper in Python</a></li>
+</ul>
+<p>Tools:</p>
+<ul>
+<li>R</li>
+<li>Python</li>
+</ul>
+<p><a href="https://github.com/florencewambui/Website/tree/master/content/post/Kaggle-Toxic-Comment-Challenge/Scripts">Code repository</a></p>
 </div>

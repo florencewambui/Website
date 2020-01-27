@@ -2,8 +2,7 @@
 title: "Flagging Toxic Comments Part 2"
 author: ''
 date: '2020-01-18'
-description: Feature Engineering and Text Classification with Logistic Regression
-
+description: Feature Engineering
 slug: toxic_comment_blog_part2
 tags: []
 categories: Machine Learning
