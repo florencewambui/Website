@@ -18,8 +18,10 @@
       <pubDate>Thu, 16 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/toxic_comment_blog_part2/</guid>
-      <description>In the [previous] post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.
-Feature 1: Length of commentsWe would expect that harmful comments would be, on average, shorter than clean comments as clean comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</description>
+      <description>In the previous post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.
+To explore features, we will use R as I prefer using R ggplot2
+We will start by reading Kaggle’s training dataset, create column “harmful” then select columns “comment_text” and “harmful”.
+library(dplyr)library(caTools)library(ggplot2)library(gridExtra)library(stringr)library(ngram)library(tm)train &amp;lt;- readRDS(&amp;quot;Kaggle-Toxic-Comment-Challenge/Data/train.</description>
     </item>
     
     <item>
