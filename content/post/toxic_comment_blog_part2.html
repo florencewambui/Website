@@ -4,9 +4,7 @@ author: ''
 date: '2020-01-18'
 description: Feature Engineering
 slug: toxic_comment_blog_part2
-tags: []
 categories: Machine Learning
-topics: []
 ---
 
 
@@ -35,13 +33,6 @@ head(train$comment_text,2)</code></pre>
 new_train = train[train_sub,]
 new_test = train[!train_sub,]</code></pre>
 <p>We create new features based on our new training dataset and explore their relationships with column “harmful”. As we will be creating numeric features, we create a function to plot density and box plots.</p>
-<pre class="r"><code>plot_column = function(train, column_x, plot_title, max){
-   g1 = ggplot(train, aes_string(x = column_x)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0, max)) + ggtitle(plot_title) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))
-   
-  g2 = ggplot(train, aes_string(y = column_x, x = &quot;harmful&quot;)) + geom_boxplot(aes(fill = harmful)) + coord_cartesian(xlim = c(0, 2000)) + ggtitle(plot_title) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;)) + coord_cartesian(ylim = c(0, max))
-   
-  grid.arrange(g1, g2, ncol = 2)  
-}</code></pre>
 <div id="length-of-comments-number-of-characters" class="section level5">
 <h5>Length of comments: Number of characters</h5>
 <p>We would expect that harmful comments would be, on average, shorter than harmless comments as harmless comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</p>
@@ -52,26 +43,21 @@ new_train %&gt;%
 <pre><code>## # A tibble: 2 x 3
 ##   harmful median_length mean_length
 ##   &lt;fct&gt;           &lt;dbl&gt;       &lt;dbl&gt;
-## 1 0                 217        404.
-## 2 1                 128        301.</code></pre>
+## 1 0                 216        404.
+## 2 1                 131        310.</code></pre>
 <p>Mean and median length of harmless comments are greater than those of harmful comments.</p>
 <p>Let’s look at distribution of length of comments:</p>
-<pre class="r"><code>plot_column(new_train, &quot;length_comment&quot;, &quot;Length of Comments&quot;, 2000)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-5-1.png" width="1152" /></p>
 <p>On average, harmful comments are shorter then harmless comments.</p>
 </div>
 <div id="length-of-comments-number-of-words" class="section level4">
 <h4>Length of comments: Number of words</h4>
-<pre class="r"><code>new_train$number_of_raw_words = as.vector(apply(X = new_train[,1, drop = F], MARGIN = 1, FUN = wordcount))
-plot_column(new_train, &quot;number_of_raw_words&quot;, &quot;Number of words&quot;, 500)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-6-1.png" width="1152" /></p>
 <p>Similar to number of characters, number of words is lower in harmful comments.</p>
 </div>
 <div id="average-length-of-words" class="section level4">
 <h4>Average length of words</h4>
 <p>We will use a simplified method to calculate the average length of words in a comment - we will include space in the number of characters.</p>
-<pre class="r"><code>new_train$average_length_of_words = new_train$length_comment/new_train$number_of_raw_words
-plot_column(new_train, &quot;average_length_of_words&quot;, &quot;Average Length of Words&quot;, 20)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-7-1.png" width="1152" /></p>
 <p>Harmful comments use shorter words on average.</p>
 </div>
@@ -120,24 +106,21 @@ new_train$number_words_cleaned = as.vector(apply(X = new_train[,6, drop = F], MA
 new_train$number_words_unique = as.vector(apply(X = new_train[,7, drop = F], MARGIN = 1, FUN = wordcount))
 new_train$proportion_repeated_words = 1 - new_train$number_words_unique/new_train$number_words_cleaned
 new_train[4,]</code></pre>
-<pre><code>##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         comment_text
-## 4 &quot;\nMore\nI can&#39;t make any real suggestions on improvement - I wondered if the section statistics should be later on, or a subsection of &quot;&quot;types of accidents&quot;&quot;  -I think the references may need tidying so that they are all in the exact same format ie date format etc. I can do that later on, if no-one else does first - if you have any preferences for formatting style on references or want to do it yourself please let me know.\n\nThere appears to be a backlog on articles for review so I guess there may be a delay until a reviewer turns up. It&#39;s listed in the relevant form eg Wikipedia:Good_article_nominations#Transport  &quot;
-##   harmful length_comment number_of_raw_words average_length_of_words
-## 4       0            622                 110                5.654545
-##                                                                                                                                                                                                                                                                                                                                                                                   cleaned_comments
-## 4 make real suggestions improvement wondered section statistics later on subsection types accidents think references may need tidying exact format date format etc can later on no one else first preferences formatting style references want please let know appears backlog articles review guess may delay reviewer turns up listed relevant form wikipedia good article nominations transport
-##                                                                                                                                                                                                                                                                                                                                                unique_word_comments
-## 4 make real suggestions improvement wondered section statistics later on subsection types accidents think references may need tidying exact format date etc can no one else first preferences formatting style want please let know appears backlog articles review guess delay reviewer turns up listed relevant form wikipedia good article nominations transport
+<pre><code>##                                                          comment_text harmful
+## 5 You, sir, are my hero. Any chance you remember what page that&#39;s on?       0
+##   length_comment number_of_raw_words average_length_of_words
+## 5             67                  13                5.153846
+##                        cleaned_comments                  unique_word_comments
+## 5 you sir hero chance remember page on  you sir hero chance remember page on 
 ##   number_words_cleaned number_words_unique proportion_repeated_words
-## 4                   55                  50                0.09090909</code></pre>
-<pre class="r"><code>plot_column(new_train, &quot;proportion_repeated_words&quot;, &quot;Proportion of Repeated Words&quot;, 1)</code></pre>
+## 5                    7                   7                         0</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-9-1.png" width="1152" /></p>
 <p>The boxplot contradicts our hypothesis that harmful comments have a higher proportion of repeated words. However, the density plot shows outliers (comments with very high proportion of repeated words) that are dominantly harmful comments. This would be representative of comments whereby the commenter dove into curse words from the first word. Let’s zoom into the outliers:</p>
 <pre class="r"><code>table(Proportion_repeated_words = new_train$proportion_repeated_words &gt; 0.9, Harmful = new_train$harmful)</code></pre>
 <pre><code>##                          Harmful
 ## Proportion_repeated_words      0      1
-##                     FALSE 100281  11164
-##                     TRUE      42    191</code></pre>
+##                     FALSE 100282  11146
+##                     TRUE      41    208</code></pre>
 <pre class="r"><code>ggplot(new_train, aes(x = proportion_repeated_words)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.9, 1)) + ggtitle(&quot;Proportion of Repeated Words&quot;) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>A better predictor of harmful comments, in place of proportion of repeated words, an indicator variable indicating whether the proportion of repeated words is very high (higher than say 0.9).</p>
@@ -152,9 +135,8 @@ new_train[4,]</code></pre>
 <pre class="r"><code>new_train$number_exclamation_marks = str_count(new_train$comment_text, &quot;!&quot;)
 print(tapply(new_train$number_exclamation_marks, new_train$harmful, mean))</code></pre>
 <pre><code>##         0         1 
-## 0.3230153 3.6751189</code></pre>
+## 0.3284268 3.6450960</code></pre>
 <p>Mean number of exclamation marks in harmful comments is 10 times higher than in harmless comments.</p>
-<pre class="r"><code>plot_column(new_train, &quot;number_exclamation_marks&quot;, &quot;Number of Exclamation Marks&quot;, 20)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-14-1.png" width="1152" /></p>
 <pre class="r"><code>new_train$clustered_exclamation_marks = grepl(&quot;!{2,}&quot;,new_train$comment_text)
 round(prop.table(table(Clustered_exclamation_marks = new_train$clustered_exclamation_marks, Harmful = new_train$harmful), margin = 2),2)</code></pre>
@@ -167,14 +149,10 @@ round(prop.table(table(Clustered_exclamation_marks = new_train$clustered_exclama
 </div>
 <div id="asterisks" class="section level4">
 <h4>Asterisks</h4>
-<pre class="r"><code>new_train$number_asterisks = str_count(new_train$comment_text, &quot;\\*&quot;)
-new_train$asterisk = grepl(&quot;\\*&quot;, new_train$comment_text)
-round(prop.table(table(Asterisks = new_train$asterisk, Harmful = new_train$harmful), margin = 2),2)</code></pre>
 <pre><code>##          Harmful
 ## Asterisks    0    1
-##     FALSE 0.99 0.98
-##     TRUE  0.01 0.02</code></pre>
-<pre class="r"><code>plot_column(new_train, &quot;number_asterisks&quot;, &quot;Number of Asterisks&quot;, 5)</code></pre>
+##     FALSE 0.99 0.97
+##     TRUE  0.01 0.03</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-16-1.png" width="1152" /></p>
 <p>Asterisks do not appear to be strong features of harmful comments thus we exclude them from our data.</p>
 <pre class="r"><code>new_train = new_train %&gt;% select(-number_asterisks, -asterisk)</code></pre>
@@ -184,9 +162,6 @@ round(prop.table(table(Asterisks = new_train$asterisk, Harmful = new_train$harmf
 <p>We would expect that harmful comments would use more uppercase letters as an expression of emotions such as anger.</p>
 <div id="proportion-of-uppercase-letters" class="section level5">
 <h5>Proportion of uppercase letters</h5>
-<pre class="r"><code>new_train$proportion_uppercase_letters = str_count(new_train$comment_text, &quot;[A-Z]&quot;)/
-  nchar(new_train$comment_text)
-plot_column(new_train, &quot;proportion_uppercase_letters&quot;, &quot;Proportion of Uppercase Letters&quot;, 1)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <p>On average, harmful comments have a higher proportion of upper case letters according to the boxplot. From the density plot, we see the bump around 0.75 indicating a rise in proportion of upper case letters amongst harmful comments. Let us zoom into this:</p>
 <pre class="r"><code>ggplot(new_train, aes(x = proportion_uppercase_letters)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.7, 1)) + ggtitle(&quot;Proportion of Uppercase Letters&quot;) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))</code></pre>
@@ -214,16 +189,11 @@ new_train$presence_of_you = grepl(&quot; you &quot;, new_train$comment_text, ign
 prop.table(table(Presence_of_you = new_train$presence_of_you, Harmful = new_train$harmful), margin = 2)</code></pre>
 <pre><code>##                Harmful
 ## Presence_of_you         0         1
-##           FALSE 0.5882382 0.4711217
-##           TRUE  0.4117618 0.5288783</code></pre>
+##           FALSE 0.5896434 0.4660151
+##           TRUE  0.4103566 0.5339849</code></pre>
 <p>More than half (53%) of harmful comments contain the word you. Let us try the number of times you is used in a comment:</p>
-<pre class="r"><code>new_train$number_of_you = str_count(tolower(new_train$comment_text),&quot; you &quot;)
-
-plot_column(new_train, &quot;number_of_you&quot;, &quot;Number of pronoun &#39;you&#39;&quot;, 20)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-23-1.png" width="1152" /></p>
 <p>On average, harmful comments have a higher number of “you”s, but harmless comments dominate harmful comments particularly in the lower counts of “you”. To standardize the number of you, we can calculate the proportion of you out of all the words use.</p>
-<pre class="r"><code>new_train$proportion_of_you = new_train$number_of_you/new_train$number_of_raw_words
-plot_column(new_train, &quot;proportion_of_you&quot;, &quot;Proportion of pronoun &#39;you&#39;&quot;, 0.5)</code></pre>
 <p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-24-1.png" width="1152" /></p>
 <p>Harmful comments have higher proportions of “you”.</p>
 <p>There are many other features we could create from the dataset provided, but for now let us use what we have created. We will create the features in our testing dataset as we did in the training dataset then save the new datasets for use in our classification model.</p>

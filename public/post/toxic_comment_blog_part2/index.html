@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Feature Engineering and Text Classification with Logistic Regression">
+  <meta name="description" content="Feature Engineering">
   <meta name="generator" content="Hugo 0.62.1" />
 
   <title>Flagging Toxic Comments Part 2 &middot; Florence Muriuki</title>
@@ -143,7 +143,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/https://www.linkedin.com/in/florence-muriuki-57239a143/" rel="me" target="_blank"><i class="fab fa-linkedin"></i></i>LinkedIn</a>
+      <a class="pure-menu-link" href="https://linkedin.com/in/florence-muriuki-57239a143" rel="me" target="_blank"><i class="fab fa-linkedin"></i></i>LinkedIn</a>
     </li>
     
 
@@ -209,7 +209,7 @@
 
 <div class="header">
   <h1>Flagging Toxic Comments Part 2</h1>
-  <h2>Feature Engineering and Text Classification with Logistic Regression</h2>
+  <h2>Feature Engineering</h2>
 </div>
 <div class="content">
 
@@ -217,19 +217,13 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>16 Jan 2020, 00:00</time>
+    <time>18 Jan 2020, 00:00</time>
   </div>
 
   
 
   
-  
-  
-  
 
-  
-  
-  
   
 
 </div>
@@ -237,24 +231,209 @@
   
 
 
-<p>In the [previous] post, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.</p>
-<div id="feature-1-length-of-comments" class="section level5">
-<h5>Feature 1: Length of comments</h5>
-<p>We would expect that harmful comments would be, on average, shorter than clean comments as clean comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</p>
-<p>Mathematics of Logistic Regression</p>
-<p>Say you wanted to predict the weight of individuals using their height, then you could use a basic equation of linear regression:</p>
-<pre><code>      $$y_i = \beta + \beta_1X_i$$ where y~i~ is the weight ofindividual i, Xi is the height of individual i, Bo is the intercept (average height) and B1 represents a value such that when height increases by that value, weight increases by that value too.
-      </code></pre>
-<p>In our harmful comment classification case, we only have two possible predictions - 1 and 0 thus the above equation would not well as it would result into figures beyond our preferred range. We transform the equation to give us yi between 0 and 1 as follows:</p>
-<pre><code>      P(y=1)/P(y=0) is called an odds ratio. The higher it is, the higher the probability that yi belongs to class 1. As probabilities are always between 0 and 1, the odd ratio will have values between 0 and positive infinity. 
-      
-      log(P(y = 1)/P(Y = 0)) transform the odd ratio to fit between 0 and 1.
-      </code></pre>
-<p>Based on the this knowledge, we transform our linear equation as follow:</p>
+<p>In the <a href="https://wambuimuriuki.netlify.com/post/toxic_comment_blog_part1/">previous post</a>, we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model.</p>
+<p><em>To explore features, we will use R as I prefer using R ggplot2</em></p>
+<p>We will start by reading Kaggle’s training dataset, create column “harmful” then select columns “comment_text” and “harmful”.</p>
+<pre class="r"><code>library(dplyr)
+library(caTools)
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+library(ngram)
+library(tm)</code></pre>
+<pre class="r"><code>train &lt;- readRDS(&quot;Kaggle-Toxic-Comment-Challenge/Data/train.rds&quot;)
+train$comment_text = as.character(train$comment_text)
+train$toxicity_score = rowSums(train[,3:8])
+train$harmful = as.factor(if_else(train$toxicity_score == 0, 0, 1))
+train = train %&gt;%
+  select(comment_text, harmful)
+head(train$comment_text,2)</code></pre>
+<pre><code>## [1] &quot;Explanation\nWhy the edits made under my username Hardcore Metallica Fan were reverted? They weren&#39;t vandalisms, just closure on some GAs after I voted at New York Dolls FAC. And please don&#39;t remove the template from the talk page since I&#39;m retired now.89.205.38.27&quot;
+## [2] &quot;D&#39;aww! He matches this background colour I&#39;m seemingly stuck with. Thanks.  (talk) 21:51, January 11, 2016 (UTC)&quot;</code></pre>
+<p>Now we create our own training and testing datasets:</p>
+<pre class="r"><code>train_sub = sample.split(train$harmful, SplitRatio = 7/10)
+new_train = train[train_sub,]
+new_test = train[!train_sub,]</code></pre>
+<p>We create new features based on our new training dataset and explore their relationships with column “harmful”. As we will be creating numeric features, we create a function to plot density and box plots.</p>
+<div id="length-of-comments-number-of-characters" class="section level5">
+<h5>Length of comments: Number of characters</h5>
+<p>We would expect that harmful comments would be, on average, shorter than harmless comments as harmless comments would seek to offer explanations while harmful comments would dive right into attacks. Let’s take a look.</p>
+<pre class="r"><code>new_train$length_comment = nchar(new_train$comment_text)
+new_train %&gt;%
+  group_by(harmful) %&gt;%
+  summarise(median_length = median(length_comment), mean_length = mean(length_comment))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   harmful median_length mean_length
+##   &lt;fct&gt;           &lt;dbl&gt;       &lt;dbl&gt;
+## 1 0                 216        404.
+## 2 1                 131        310.</code></pre>
+<p>Mean and median length of harmless comments are greater than those of harmful comments.</p>
+<p>Let’s look at distribution of length of comments:</p>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-5-1.png" width="1152" /></p>
+<p>On average, harmful comments are shorter then harmless comments.</p>
+</div>
+<div id="length-of-comments-number-of-words" class="section level4">
+<h4>Length of comments: Number of words</h4>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-6-1.png" width="1152" /></p>
+<p>Similar to number of characters, number of words is lower in harmful comments.</p>
+</div>
+<div id="average-length-of-words" class="section level4">
+<h4>Average length of words</h4>
+<p>We will use a simplified method to calculate the average length of words in a comment - we will include space in the number of characters.</p>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-7-1.png" width="1152" /></p>
+<p>Harmful comments use shorter words on average.</p>
+</div>
+<div id="proportion-of-repeated-words" class="section level4">
+<h4>Proportion of repeated words</h4>
+<p>We would expect that harmless comments use repetition less than harmful comments as harmless comments are aimed at passing a message whereas harmful comments are emotional and use repetitive words for emphasis.</p>
+<pre class="r"><code>english_stopwords = stopwords(&quot;english&quot;)
+
+clean_comments = function(x){
+  x = tolower(x)
+  x = gsub(&quot;[0-9]&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\n&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\t&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\\s+&quot;, &quot; &quot;, x)
+  d = unlist(strsplit(x, &quot; &quot;))
+  d = d[!(d %in% english_stopwords) &amp; nchar(d) &gt; 2]
+  x = paste(d, collapse = &quot; &quot;)
+  x = gsub(&quot;[^a-z&#39;]&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\\s+&quot;, &quot; &quot;, x)
+  return(x)
+}
+
+
+
+remove_repeated_words = function(x){
+  x = tolower(x)
+  x = gsub(&quot;[0-9]&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\n&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\t&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\\s+&quot;, &quot; &quot;, x)
+  d = unlist(strsplit(x, &quot; &quot;))
+  d = d[!(d %in% english_stopwords) &amp; nchar(d) &gt; 2]
+  x = paste(unique(d), collapse = &quot; &quot;)
+  x = gsub(&quot;[^a-z&#39;]&quot;, &quot; &quot;, x)
+  x = gsub(&quot;\\s+&quot;, &quot; &quot;, x)
+  return(x)
+  
+}
+
+new_train$cleaned_comments = as.vector(apply(X = new_train[,1, drop = F], MARGIN = 1, FUN = clean_comments))
+
+new_train$unique_word_comments = as.vector(apply(X = new_train[,1, drop = F], MARGIN = 1, FUN = remove_repeated_words))
+
+
+new_train$number_words_cleaned = as.vector(apply(X = new_train[,6, drop = F], MARGIN = 1, FUN = wordcount))
+new_train$number_words_unique = as.vector(apply(X = new_train[,7, drop = F], MARGIN = 1, FUN = wordcount))
+new_train$proportion_repeated_words = 1 - new_train$number_words_unique/new_train$number_words_cleaned
+new_train[4,]</code></pre>
+<pre><code>##                                                          comment_text harmful
+## 5 You, sir, are my hero. Any chance you remember what page that&#39;s on?       0
+##   length_comment number_of_raw_words average_length_of_words
+## 5             67                  13                5.153846
+##                        cleaned_comments                  unique_word_comments
+## 5 you sir hero chance remember page on  you sir hero chance remember page on 
+##   number_words_cleaned number_words_unique proportion_repeated_words
+## 5                    7                   7                         0</code></pre>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-9-1.png" width="1152" /></p>
+<p>The boxplot contradicts our hypothesis that harmful comments have a higher proportion of repeated words. However, the density plot shows outliers (comments with very high proportion of repeated words) that are dominantly harmful comments. This would be representative of comments whereby the commenter dove into curse words from the first word. Let’s zoom into the outliers:</p>
+<pre class="r"><code>table(Proportion_repeated_words = new_train$proportion_repeated_words &gt; 0.9, Harmful = new_train$harmful)</code></pre>
+<pre><code>##                          Harmful
+## Proportion_repeated_words      0      1
+##                     FALSE 100282  11146
+##                     TRUE      41    208</code></pre>
+<pre class="r"><code>ggplot(new_train, aes(x = proportion_repeated_words)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.9, 1)) + ggtitle(&quot;Proportion of Repeated Words&quot;) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))</code></pre>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>A better predictor of harmful comments, in place of proportion of repeated words, an indicator variable indicating whether the proportion of repeated words is very high (higher than say 0.9).</p>
+<pre class="r"><code>new_train$extreme_repetition = factor(if_else(new_train$proportion_repeated_words &gt; 0.9, 1, 0))</code></pre>
+</div>
+<div id="special-characters-and-punctuation-in-comments" class="section level4">
+<h4>Special characters and punctuation in comments</h4>
+<p>We’ld expect that harmful comments have more special characters and punctuations such as * and exclamation marks. Let’s see if the data supports this.</p>
+<div id="clustered-exclamation-marks" class="section level5">
+<h5>Clustered exclamation marks</h5>
+<p>We look at both the number of exclamation marks and the presence of a chain of exclamation marks such as !!!!!!!</p>
+<pre class="r"><code>new_train$number_exclamation_marks = str_count(new_train$comment_text, &quot;!&quot;)
+print(tapply(new_train$number_exclamation_marks, new_train$harmful, mean))</code></pre>
+<pre><code>##         0         1 
+## 0.3284268 3.6450960</code></pre>
+<p>Mean number of exclamation marks in harmful comments is 10 times higher than in harmless comments.</p>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-14-1.png" width="1152" /></p>
+<pre class="r"><code>new_train$clustered_exclamation_marks = grepl(&quot;!{2,}&quot;,new_train$comment_text)
+round(prop.table(table(Clustered_exclamation_marks = new_train$clustered_exclamation_marks, Harmful = new_train$harmful), margin = 2),2)</code></pre>
+<pre><code>##                            Harmful
+## Clustered_exclamation_marks    0    1
+##                       FALSE 0.99 0.91
+##                       TRUE  0.01 0.09</code></pre>
+<p>9% of harmful comments have clustered exclamation marks as opposed to only 1% of harmless comments.</p>
+</div>
+</div>
+<div id="asterisks" class="section level4">
+<h4>Asterisks</h4>
+<pre><code>##          Harmful
+## Asterisks    0    1
+##     FALSE 0.99 0.97
+##     TRUE  0.01 0.03</code></pre>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-16-1.png" width="1152" /></p>
+<p>Asterisks do not appear to be strong features of harmful comments thus we exclude them from our data.</p>
+<pre class="r"><code>new_train = new_train %&gt;% select(-number_asterisks, -asterisk)</code></pre>
+</div>
+<div id="casing-of-comments---use-of-all-uppercase-letters" class="section level4">
+<h4>Casing of comments - use of all uppercase letters</h4>
+<p>We would expect that harmful comments would use more uppercase letters as an expression of emotions such as anger.</p>
+<div id="proportion-of-uppercase-letters" class="section level5">
+<h5>Proportion of uppercase letters</h5>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>On average, harmful comments have a higher proportion of upper case letters according to the boxplot. From the density plot, we see the bump around 0.75 indicating a rise in proportion of upper case letters amongst harmful comments. Let us zoom into this:</p>
+<pre class="r"><code>ggplot(new_train, aes(x = proportion_uppercase_letters)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0.7, 1)) + ggtitle(&quot;Proportion of Uppercase Letters&quot;) + scale_fill_manual(values = c(&quot;1&quot; = &quot;red&quot;, &quot;0&quot; = &quot;grey&quot;))</code></pre>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>We create a column indicating whether a comment has a very high proportion of uppercase letters.</p>
+<pre class="r"><code>new_train$extreme_uppercase = factor(if_else(new_train$proportion_uppercase_letters &gt; 0.7, 1, 0))</code></pre>
+</div>
+<div id="clustered-uppercase-letters" class="section level5">
+<h5>Clustered uppercase letters</h5>
+<pre class="r"><code>new_train$clustered_uppercase = grepl(&quot;[A-Z]{5,}&quot;, new_train$comment_text)
+
+round(prop.table(table(Harmful = new_train$harmful, clustered_uppercase = new_train$clustered_uppercase), margin = 1) * 100)</code></pre>
+<pre><code>##        clustered_uppercase
+## Harmful FALSE TRUE
+##       0    92    8
+##       1    79   21</code></pre>
+<p>Harmful comments are approximately 3 times more likely to have clustered (a chain of at least 5) uppercase letters as compared to harmless comments.</p>
+</div>
+</div>
+<div id="presence-of-pronoun-you" class="section level4">
+<h4>Presence of pronoun “you”</h4>
+<p>Harmful comments are likely to be targetted at specific individuals and use of “you” is a good indicator that a comment is less likely a general comment than a targetted comment.</p>
+<pre class="r"><code>new_train$you_comment_text = gsub(&quot;you&#39;re&quot;, &quot;you are&quot;, new_train$comment_text, ignore.case = TRUE)
+new_train$presence_of_you = grepl(&quot; you &quot;, new_train$comment_text, ignore.case = TRUE)
+prop.table(table(Presence_of_you = new_train$presence_of_you, Harmful = new_train$harmful), margin = 2)</code></pre>
+<pre><code>##                Harmful
+## Presence_of_you         0         1
+##           FALSE 0.5896434 0.4660151
+##           TRUE  0.4103566 0.5339849</code></pre>
+<p>More than half (53%) of harmful comments contain the word you. Let us try the number of times you is used in a comment:</p>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-23-1.png" width="1152" /></p>
+<p>On average, harmful comments have a higher number of “you”s, but harmless comments dominate harmful comments particularly in the lower counts of “you”. To standardize the number of you, we can calculate the proportion of you out of all the words use.</p>
+<p><img src="/post/toxic_comment_blog_part2_files/figure-html/unnamed-chunk-24-1.png" width="1152" /></p>
+<p>Harmful comments have higher proportions of “you”.</p>
+<p>There are many other features we could create from the dataset provided, but for now let us use what we have created. We will create the features in our testing dataset as we did in the training dataset then save the new datasets for use in our classification model.</p>
+<p><img src="/post/toxic_comment_blog_part2_files/read_data.PNG" /></p>
+<p><img src="/post/toxic_comment_blog_part2_files/scale.PNG" /></p>
+<p><img src="/post/toxic_comment_blog_part2_files/map.PNG" /></p>
+<p><img src="/post/toxic_comment_blog_part2_files/model.PNG" /></p>
+<p>The additional features improves the recall of the previous model (based on the comments only) by 2% taking the recall to 60%. In the next post, we use deep learning to further improve the recall.</p>
 <p>References:</p>
 <ul>
-<li>Building Machine Learning Systems with Python by Willi Richerto and Luis Pedro Cooelho Chapter 5</li>
+<li><a href="https://sondosatwi.wordpress.com/2017/08/01/using-text-data-and-dataframemapper-in-python/">Text classification and feature union with DataFrameMapper in Python</a></li>
 </ul>
+<p>Tools:</p>
+<ul>
+<li>R</li>
+<li>Python</li>
+</ul>
+<p><a href="https://github.com/florencewambui/Website/tree/master/content/post/Kaggle-Toxic-Comment-Challenge/Scripts">Code repository</a></p>
 </div>
 
   
