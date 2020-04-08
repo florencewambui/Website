@@ -4,9 +4,7 @@ author: ''
 date: '2020-01-18'
 description: Feature Engineering
 slug: toxic_comment_blog_part2
-tags: []
 categories: Machine Learning
-topics: []
 ---
 
 In the [previous post](https://wambuimuriuki.netlify.com/post/toxic_comment_blog_part1/), we used words to classify Wikipedia comments as harmful or harmless. In this post, we will create a few features from the comments and build another classification model. 
@@ -50,13 +48,13 @@ new_test = train[!train_sub,]
 We create new features based on our new training dataset and explore their relationships with column "harmful". As we will be creating numeric features, we create a function to plot density and box plots.
 
 
-```{r, include = T, warning=F, message =FALSE}
+```{r, echo = F, warning=F, message =FALSE}
 plot_column = function(train, column_x, plot_title, max){
    g1 = ggplot(train, aes_string(x = column_x)) + geom_density(aes(fill = harmful)) + coord_cartesian(xlim = c(0, max)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
    
-  g2 = ggplot(train, aes_string(y = column_x, x = "harmful")) + geom_boxplot(aes(fill = harmful)) + coord_cartesian(xlim = c(0, 2000)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey")) + coord_cartesian(ylim = c(0, max))
+  g2 = ggplot(train, aes_string(y = column_x, x = "harmful")) + geom_boxplot(aes(fill = harmful)) + coord_cartesian(ylim = c(0, max)) + ggtitle(plot_title) + scale_fill_manual(values = c("1" = "red", "0" = "grey"))
    
-  grid.arrange(g1, g2, ncol = 2)  
+grid.arrange(g1, g2, ncol = 2)  
 }
 ```
 
@@ -81,7 +79,7 @@ Mean and median length of harmless comments are greater than those of harmful co
 
 Let's look at distribution of length of comments:
 
-```{r, include = T, warning=F, message =FALSE, fig.height = 4, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height = 4, fig.width=12}
 plot_column(new_train, "length_comment", "Length of Comments", 2000)
 ```
 
@@ -89,7 +87,7 @@ On average, harmful comments are shorter then harmless comments.
 
 #### Length of comments: Number of words
 
-```{r, include = T, warning=F, message =FALSE, fig.height =5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height =5, fig.width=12}
 new_train$number_of_raw_words = as.vector(apply(X = new_train[,1, drop = F], MARGIN = 1, FUN = wordcount))
 plot_column(new_train, "number_of_raw_words", "Number of words", 500)
 ```
@@ -100,7 +98,7 @@ Similar to number of characters, number of words is lower in harmful comments.
 #### Average length of words
 We will use a simplified method to calculate the average length of words in a comment - we will include space in the number of characters.
 
-```{r, include = T, warning=F, message =FALSE, fig.height=5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height=5, fig.width=12}
 new_train$average_length_of_words = new_train$length_comment/new_train$number_of_raw_words
 plot_column(new_train, "average_length_of_words", "Average Length of Words", 20)
 ```
@@ -162,7 +160,7 @@ new_train[4,]
 ```
 
 
-```{r, include = T, warning=F, message =FALSE, fig.height=5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height=5, fig.width=12}
 plot_column(new_train, "proportion_repeated_words", "Proportion of Repeated Words", 1)
 
 
@@ -207,7 +205,7 @@ Mean number of exclamation marks in harmful comments is 10 times higher than in 
 
 
 
-```{r, include = T, warning=F, message =FALSE, fig.height = 5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height = 5, fig.width=12}
 plot_column(new_train, "number_exclamation_marks", "Number of Exclamation Marks", 20)
 ```
 
@@ -222,7 +220,7 @@ round(prop.table(table(Clustered_exclamation_marks = new_train$clustered_exclama
 
 
 #### Asterisks
-```{r, include = T, warning=F, message =FALSE, fig.height = 5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height = 5, fig.width=12}
 new_train$number_asterisks = str_count(new_train$comment_text, "\\*")
 new_train$asterisk = grepl("\\*", new_train$comment_text)
 round(prop.table(table(Asterisks = new_train$asterisk, Harmful = new_train$harmful), margin = 2),2)
@@ -243,7 +241,7 @@ new_train = new_train %>% select(-number_asterisks, -asterisk)
 We would expect that harmful comments would use more uppercase letters as an expression of emotions such as anger.
 
 ##### Proportion of uppercase letters
-```{r, include = T, warning=F, message =FALSE}
+```{r, echo = F, warning=F, message =FALSE}
 new_train$proportion_uppercase_letters = str_count(new_train$comment_text, "[A-Z]")/
   nchar(new_train$comment_text)
 plot_column(new_train, "proportion_uppercase_letters", "Proportion of Uppercase Letters", 1)
@@ -290,7 +288,7 @@ prop.table(table(Presence_of_you = new_train$presence_of_you, Harmful = new_trai
 More than half (53%) of harmful comments contain the word you. Let us try the number of times you is used in a comment:
 
 
-```{r, include = T, warning=F, message =FALSE, fig.height=5, fig.width=12}
+```{r, echo = F, warning=F, message =FALSE, fig.height=5, fig.width=12}
 
 new_train$number_of_you = str_count(tolower(new_train$comment_text)," you ")
 
@@ -301,7 +299,7 @@ plot_column(new_train, "number_of_you", "Number of pronoun 'you'", 20)
 
 On average, harmful comments have a higher number of "you"s, but harmless comments dominate harmful comments particularly in the lower counts of "you". To standardize the number of you, we can calculate the proportion of you out of all the words use.
 
-```{r, include = T, warning=F, message =FALSE, fig.height = 5, fig.width = 12}
+```{r, echo = F, warning=F, message =FALSE, fig.height = 5, fig.width = 12}
 new_train$proportion_of_you = new_train$number_of_you/new_train$number_of_raw_words
 plot_column(new_train, "proportion_of_you", "Proportion of pronoun 'you'", 0.5)
 
