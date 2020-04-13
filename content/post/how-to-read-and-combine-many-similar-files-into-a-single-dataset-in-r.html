@@ -1,0 +1,164 @@
+---
+title: How to read and combine many similar files into a single dataset in R
+author: Florence Muriuki
+date: '2020-04-09'
+slug: how-to-combine-many-similar-files-into-a-single-dataset-in-r
+categories: []
+tags:
+  - '#rstats'
+description: ''
+topics: []
+---
+
+
+
+<p>Suppose you have many similar files in .xlsx, .xls or .csv files with similar data, possibly in
+(almost) similar format, you definitely want to read all the files and combine the data in a single step instead of reading each file at a time. Scenarios in which this case of similar files may arise include, but are not limited to:</p>
+<ol style="list-style-type: decimal">
+<li><p>Survey data where you have multiple enumerators. In cases where the survey questions are similar and you are using tools such as ODK/Kobo, then the collected data looks the same just that you have different respondents/responses in different files from different enumerators.</p></li>
+<li><p>Longitudinal data where the same data is collected periodically in the same format. A good example is daily share prices collected in .xlsx files such that at the end of the month you have 20+ files. Each file is named the date on which the share prices corresponds to e.g 12-04-2020.xlsx. Here is a screenshot of what the share prices may look like:</p></li>
+</ol>
+<p><img src="/post/2020-04-09-how-to-combine-many-similar-files-into-a-single-dataset-in-r_files/nse_share_prices.PNG" width="300" height="150" /></p>
+<p>We will use the example of daily share prices to work through how to read multiple files and to combine them into a single dataset.</p>
+<div id="step-1-gather-the-data-into-one-folder" class="section level4">
+<h4>Step 1: Gather the data into one folder</h4>
+<p>It would be sensible, at the onset of data collection, to ensure all daily share prices files are placed within the same folder. Just in case this is not the case, gather all the files into one folder named daily_files within a parent folder called nse_share_prices. In rstudio, create a project within the nse_share_prices. Ensure all the files are in the same file type, be it .xlsx, .xls or .csv and are named in the same format e.g dd-mm-yyyy. Your daily_files folder would look look like this:
+<img src="/post/2020-04-09-how-to-combine-many-similar-files-into-a-single-dataset-in-r_files/file_names.PNG" /></p>
+<p>Let’s assume that within your parent folder (nse_share_prices) you have the following folders:</p>
+<ul>
+<li><p>daily_files which contains the share prices files</p></li>
+<li><p>scripts which contains all the scripts you write pertaining this project</p></li>
+<li><p>combined_data which will contain the combined dataset we will create</p></li>
+</ul>
+<p>Your project folder will look like this:
+<img src="/post/2020-04-09-how-to-combine-many-similar-files-into-a-single-dataset-in-r_files/parent_folder.PNG" /></p>
+</div>
+<div id="step-2-create-a-function-to-read-the-files" class="section level4">
+<h4>Step 2: Create a function to read the files</h4>
+<p>Within your scripts folder, create .R or .Rmd file to read your data. In this example, the files are named as dates corresponding to share prices so we want to add a date column to each file that takes the name of the file. We will create a function that reads each file, removes a column, creates a date column and populates the date column:</p>
+<pre class="r"><code>library(readxl)
+library(dplyr)
+
+filepath = &quot;../daily_files/&quot;
+
+prepare_daily_files = function(filename){
+  file = read_excel(paste0(filepath, filename))
+  filename = gsub(&quot;.xlsx&quot;, &quot;&quot;, filename)
+  colnames(file) = c(&quot;company&quot;, &quot;last_traded_price_in_ksh&quot;, &quot;previous_price_in_ksh&quot;, &quot;change&quot;)
+  file = file %&gt;% select(-change)
+  file$date = as.Date(filename, format = &quot;%d-%m-%Y&quot;)
+  return(file)
+}</code></pre>
+<p>If your files require more data preparation, you can add code to do that within the prepare_daily_prices function. The file path format will depend on the operating system used. This example uses Windows. In .rmd file, note the use of “../” in filepath to specify the parent directory such that “../daily_files/ indicates sibling directory. In .r file, use”./".</p>
+<p>We test the function with one file to confirm that it works by running prepare_daily_files() on a single file:</p>
+<pre class="r"><code>test_file = prepare_daily_files(&quot;09-04-2020.xlsx&quot;)</code></pre>
+</div>
+<div id="step-3-create-a-list-of-the-files-you-want-to-read" class="section level4">
+<h4>Step 3: Create a list of the files you want to read</h4>
+<p>Once you’re satisfied with your function, list all the relevant files in your daily_prices directory:</p>
+<pre class="r"><code>daily_files = list.files(filepath, &quot;.xlsx&quot;)</code></pre>
+</div>
+<div id="step-4-read-all-the-listed-files-and-combine-them-into-a-single-dataset" class="section level4">
+<h4>Step 4: Read all the listed files and combine them into a single dataset</h4>
+<div id="method-1" class="section level5">
+<h5>Method 1</h5>
+<p>My first instinct was to create an empty dataframe, then bind_rows() each file to the resulting dataframe at the end of previous loop like this:</p>
+<pre class="r"><code>combined_data = data.frame(matrix(ncol = 4, nrow = 0))
+colnames(combined_data) = c(&quot;company&quot;, &quot;last_traded_price_in_ksh&quot;, &quot;previous_price_in_ksh&quot;, &quot;date&quot;)
+
+for (i in 1:length(daily_files)){
+  filename = daily_files[i]
+  file = prepare_daily_files(daily_files[i])
+  combined_data = bind_rows(combined_data, file) 
+  
+}</code></pre>
+<p>Note how I have used the same name “combined_data” in the for loop as I used to create the empty dataframe. If you use a different name in the for loop, only data from the last file will be returned.</p>
+</div>
+<div id="method-2" class="section level5">
+<h5>Method 2</h5>
+<p>I had used a different name and it took ages to figure out what I was doing wrong and in that process, I came across a different method to combine the data from <a href="https://stackoverflow.com/questions/29402528/append-data-frames-together-in-a-for-loop/29419402">stackoverflow</a>. Here is a description of this second method:</p>
+<p>Start by initialializing a list into which the files will be stored once read, then use a for loop to read the files and assign each file to the created list.</p>
+<pre class="r"><code>filelist = list()
+
+for (i in 1:length(daily_files)){
+  filename = daily_files[i]
+  result_file = prepare_daily_files(daily_files[i])
+  filelist[[i]] = result_file
+  
+}</code></pre>
+<p>When the above code runs successfully, you will see in your environment object filelist containing the same number of files as your daily_files folder. When you call filelist[[1]], you will be able to see the contents of file 1.</p>
+<p>Combine the data in the list as follows:</p>
+<pre class="r"><code>combined_data = do.call(bind_rows, filelist)</code></pre>
+<p>combined_data will contain data from all the files read. In case of errors listing the files generating errors, subset the problematic files each at a time to see what is causing the errors. For example, if file 10 is causing an error, use filelist[[10]] to view file 10 and to see possible reasons for the error. From my experience, it could be that the problematic file is different from the other files in a way you had not anticipated when creating prepare_daily_files(). You can rectify the file and try reading the files again.</p>
+<p>The prepare_daily_prices function can be modified to accommodate different file types and different data cleaning steps as needed.</p>
+</div>
+</div>
+<div id="putting-everything-together" class="section level3">
+<h3>Putting everything together</h3>
+<p>All the code from method 1 looks like this:</p>
+<pre class="r"><code>library(readxl)
+library(dplyr)
+
+filepath = &quot;../daily_files/&quot;
+
+prepare_daily_files = function(filename){
+  file = read_excel(paste0(filepath, filename))
+  filename = gsub(&quot;.xlsx&quot;, &quot;&quot;, filename)
+  colnames(file) = c(&quot;company&quot;, &quot;last_traded_price_in_ksh&quot;, &quot;previous_price_in_ksh&quot;, &quot;change&quot;)
+  file = file %&gt;% select(-change)
+  file$date = as.Date(filename, format = &quot;%d-%m-%Y&quot;)
+  return(file)
+}
+
+test_file = prepare_daily_files(&quot;09-04-2020.xlsx&quot;)
+
+daily_files = list.files(filepath, &quot;.xlsx&quot;)
+
+combined_data = data.frame(matrix(ncol = 4, nrow = 0))
+colnames(combined_data) = c(&quot;company&quot;, &quot;last_traded_price_in_ksh&quot;, &quot;previous_price_in_ksh&quot;, &quot;date&quot;)
+
+for (i in 1:length(daily_files)){
+  filename = daily_files[i]
+  file = prepare_daily_files(daily_files[i])
+  combined_data = bind_rows(combined_data, file) 
+  
+}</code></pre>
+<p>All the code from method 2 looks like this:</p>
+<pre class="r"><code>library(readxl)
+library(dplyr)
+
+filepath = &quot;../daily_files/&quot;
+
+prepare_daily_files = function(filename){
+  file = read_excel(paste0(filepath, filename))
+  filename = gsub(&quot;.xlsx&quot;, &quot;&quot;, filename)
+  colnames(file) = c(&quot;company&quot;, &quot;last_traded_price_in_ksh&quot;, &quot;previous_price_in_ksh&quot;, &quot;change&quot;)
+  file = file %&gt;% select(-change)
+  file$date = as.Date(filename, format = &quot;%d-%m-%Y&quot;)
+  return(file)
+}
+
+test_file = prepare_daily_files(&quot;09-04-2020.xlsx&quot;)
+
+daily_files = list.files(filepath, &quot;.xlsx&quot;)
+
+filelist = list()
+
+for (i in 1:length(daily_files)){
+  filename = daily_files[i]
+  result_file = prepare_daily_files(daily_files[i])
+  filelist[[i]] = result_file
+  
+}
+
+combined_data = do.call(bind_rows, filelist)</code></pre>
+<p>Tools:</p>
+<ul>
+<li><a href="https://www.r-project.org/">R</a></li>
+</ul>
+<p>References:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/29402528/append-data-frames-together-in-a-for-loop/29419402" class="uri">https://stackoverflow.com/questions/29402528/append-data-frames-together-in-a-for-loop/29419402</a></li>
+</ul>
+<p><a href="https://github.com/florencewambui/Website/blob/master/content/post/how-to-read-and-combine-many-similar-files-into-a-single-dataset-in-r">Github repository</a></p>
+</div>
