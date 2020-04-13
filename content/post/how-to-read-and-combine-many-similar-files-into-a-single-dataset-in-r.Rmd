@@ -3,9 +3,7 @@ title: How to read and combine many similar files into a single dataset in R
 author: Florence Muriuki
 date: '2020-04-09'
 slug: how-to-combine-many-similar-files-into-a-single-dataset-in-r
-categories: []
-tags:
-  - '#rstats'
+categories: [How to]
 description: ''
 topics: []
 ---
