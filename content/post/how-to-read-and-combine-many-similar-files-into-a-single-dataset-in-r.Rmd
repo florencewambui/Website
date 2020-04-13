@@ -8,6 +8,10 @@ description: ''
 topics: []
 ---
 
+#### Summary
+
+*In this post, we look at how to read many similar files at once and combine them into a single dataset in R.*
+
 Suppose you have many similar files in .xlsx, .xls or .csv files with similar data, possibly in
 (almost) similar format, you definitely want to read all the files and combine the data in a single step instead of reading each file at a time. Scenarios in which this case of similar files may arise include, but are not limited to:
 
@@ -207,6 +211,19 @@ combined_data = do.call(bind_rows, filelist)
 
 ```
 
+The combined data looks like this:
+
+![](/post/how-to-read-and-combine-many-similar-files-into-a-single-dataset-in-r_files/combined_data.PNG){width=300px height=100px}
+
+
+#### Step 5: Save the combined data
+
+The point of reading all the files and combining them into a single dataset is to use the data later. To avoid combining the data every single time you need it, you can save it in the combined_data folder in your preferred file type:
+
+```{r, eval = F, warning = F, message = F}
+write.csv(combined_data, "../combined_data/april_combined_data.csv", row.names = F)
+
+```
 
 
 Tools: 
