@@ -1,0 +1,218 @@
+---
+title: "Getting Started With R"
+author: "Florence Muriuki"
+date: '2020-04-15'
+description: ''
+slug: my-experience-getting-started-with-r
+tags: []
+categories: How to
+topics: []
+output:
+  blogdown::html_page:
+    toc: true
+
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#part-1-setting-up">Part 1: Setting Up</a></li>
+<li><a href="#part-2-r-basics">Part 2: R Basics</a></li>
+<li><a href="#part-3-r-packages-to-take-you-beyond-the-basics">Part 3: R packages to take you beyond the basics</a></li>
+<li><a href="#part-4-more-advanced-and-task-specific-packages">Part 4: More advanced and task specific packages</a></li>
+<li><a href="#part-5-git-and-githubgitlab">Part 5: Git and Github/Gitlab</a></li>
+<li><a href="#part-6-statistics">Part 6: Statistics</a></li>
+<li><a href="#part-7-machine-learning">Part 7: Machine Learning</a></li>
+<li><a href="#part-8-complementary-tools">Part 8: Complementary Tools</a></li>
+<li><a href="#part-9-more-resources">Part 9: More Resources</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level4">
+<h4>Introduction</h4>
+<p><em>In this post, I describe the things I have learnt to do in R and the resources that I used. There is no particular path to follow when learning a programming language, but in this article I will sequence the learning in a way that makes sense in retrospect.
+</em></p>
+</div>
+<div id="part-1-setting-up" class="section level3">
+<h3>Part 1: Setting Up</h3>
+<p>We learn programming by doing. The first few times you copy what someone else is doing, with time you are able to write code from memory and eventually you are able to combine the various things you know to create solutions for your specific problems. There are two main ways to learn R by programming:</p>
+<p><strong>1. Using online platforms that allow you to type code and see results.</strong> All you need is internet connection and a user account.</p>
+<p>One such platform is <a href="https://www.datacamp.com/">Datacamp</a> and it offers beginner courses. You can be able to access a few courses and topics for free, but you need a paid subscription to access all courses and topics. Datacamp offers an <a href="https://www.datacamp.com/courses/free-introduction-to-r">introduction to R course</a>. Another online learning platform is <a href="https://www.codecademy.com/">Codecademy</a> and it offers this <a href="https://www.codecademy.com/learn/learn-r">introduction to R course</a>. You can certainly find other online learning platforms on the web.</p>
+<p><strong>2. Install and use R on your computer</strong>. This might be a good choice for someone without continous internet connection and who prefers unlimited freedom when learning. This is the method I used and still use.</p>
+<p>To install R, all you need is a basic computer. I started out with a 2GB RAM laptop and limited storage.I had a smooth learning experience as R is a light program particularly when running a few lines of code on a small dataset. Use what you have.</p>
+<p>R comes with its own interface/editor called R GUI, however I recommend installing RStudio - a more beautiful interface with way better user experience- immediately after installing R. To install R, go to this <a href="https://www.r-project.org/">R page</a> and to install Rstudio, go to this <a href="https://rstudio.com/products/rstudio/download/">Rstudio page</a>. If you need step by step instructions on the installation processes, use this <a href="https://www.datacamp.com/community/tutorials/installing-R-windows-mac-ubuntu">Datacamp guide</a>. Once R and Rstudio are successfully installed, you are ready to code as you learn.</p>
+</div>
+<div id="part-2-r-basics" class="section level3">
+<h3>Part 2: R Basics</h3>
+<p>Below is a list of some basics to cover:</p>
+<ul>
+<li><p>Data types</p></li>
+<li><p>Loading data</p></li>
+<li><p>Quickly understanding the data you have</p></li>
+<li><p>Subsetting data</p></li>
+<li><p>Plotting</p></li>
+<li><p>Saving data</p></li>
+<li><p>Importing packages</p></li>
+<li><p>Functions</p></li>
+</ul>
+<p>Some good resources to cover the above basics include:</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf">Cran Introduction to R pdf</a> chapters 1 to 10, chapter 13</p></li>
+<li><p><a href="https://swirlstats.com/">Swirl</a> is a good learning package that teaches you as you go along (an offline alternative to Datacamp and the likes). To get started with swirl, use this
+<a href="https://swirlstats.com/students.html">guide</a>.</p></li>
+<li><p>For those who prefer video lectures, <a href="https://www.coursera.org/specializations/data-science-foundations-r#courses">Data Science: Foundations using R Specialization</a> is a great resource that starts from basics.</p></li>
+<li><p>For those who prefer online learning platforms like Datacamp and Codecademy, you can find various introductory courses on your preferred platforms.</p></li>
+</ol>
+</div>
+<div id="part-3-r-packages-to-take-you-beyond-the-basics" class="section level3">
+<h3>Part 3: R packages to take you beyond the basics</h3>
+<p><img src="/post/2020-04-15-my-experience-getting-started-with-r_files/tidyverse.PNG" width="200" height="200" /></p>
+<p>R packages are smaller programs that extend the power of R. In this section, I cover packages that I almost always use in data analysis projects and links to some helpful resources:</p>
+<ul>
+<li><p>Package to read csv, tsv and fwf files: <a href="https://readr.tidyverse.org/">readr</a></p></li>
+<li><p>Package to read .xls/.xlsx files: <a href="https://readxl.tidyverse.org/">readxl</a></p></li>
+<li><p>Package that offers an alternative data type to Data Frame: <a href="https://r4ds.had.co.nz/tibbles.html">tibble</a></p></li>
+<li><p>Package to work with data at data analysis stage: <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">dplyr</a></p></li>
+<li><p>Package to tidy and reshape data: <a href="https://r4ds.had.co.nz/tidy-data.html">tidyr</a></p></li>
+<li><p>Package to create beautiful visualizations: <a href="http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html">ggplot2</a> read through all the 3 blog posts</p></li>
+<li><p>Package to work with date columns: <a href="https://r4ds.had.co.nz/dates-and-times.html">lubridate</a></p></li>
+<li><p>Package to work with text data: <a href="https://r4ds.had.co.nz/strings.html">stringr</a></p></li>
+</ul>
+<p>The aforementioned Intro to R swirl course also covers some of these packages.</p>
+<p>readr, tibble, dplyr, tidyr and stringr are some of the packages in a collection of packages known as Tidyverse.</p>
+<p>I use Tidyverse, but there is an alternative package known as <strong>data.table</strong>. Some resources to learn data.table include:</p>
+<ul>
+<li><p><a href="https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/" class="uri">https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/</a></p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html" class="uri">https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html</a></p></li>
+<li><p><a href="https://www.r-bloggers.com/intro-to-the-data-table-package/" class="uri">https://www.r-bloggers.com/intro-to-the-data-table-package/</a></p></li>
+</ul>
+<p>You can learn either tidyverse, data.table or both.</p>
+</div>
+<div id="part-4-more-advanced-and-task-specific-packages" class="section level3">
+<h3>Part 4: More advanced and task specific packages</h3>
+<p><strong>Rmarkdown</strong> allows you to combine normal text and code. It comes in handy when you want to include explanations to your code, visualizations and analysis outputs. It is what I have used to write this blog post. Rstudio offers great <a href="https://rmarkdown.rstudio.com/lesson-1.html">Rmarkdown learning resources here</a>.</p>
+<p><strong>Shiny</strong> allows you to create web applications with limited knowledge of HTML and Javascript. It comes in handy when you want others to interact with the product of your code without them knowing or installing R. The most common use of Shiny, I have seen, is creating interactive dashboards. Rstudio provides <a href="https://shiny.rstudio.com/gallery/">shiny examples here</a> and great <a href="https://shiny.rstudio.com/tutorial/">shiny learning resources here</a>.</p>
+<p><strong>Rvest</strong> allows you to scrape data from the web. A great <a href="https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/">rvest learning resource is here</a>.</p>
+<p><strong>Blogdown</strong> allows you to create blog posts like this one in R. Blogdown works with Github to store your code and hosting services such as Netlify to host your blog. This article guides you on <a href="https://alison.rbind.io/post/2017-06-12-up-and-running-with-blogdown/">how to use blogdown to create your blog with blogdown</a>. It would help to be familiar with Github before learning blogdown.</p>
+</div>
+<div id="part-5-git-and-githubgitlab" class="section level3">
+<h3>Part 5: Git and Github/Gitlab</h3>
+<p>Git is a versioning tool that keeps track of the changes you make to your code. Github and Gitlab are examples of code repositories that allow you to store and share your code online. To learn how to use Rstudio with Git and Github, use the following resources:</p>
+<ul>
+<li><p><a href="https://happygitwithr.com/">A book: Happy Git and GitHub for the useR</a></p></li>
+<li><p><a href="https://www.r-bloggers.com/rstudio-and-github/">A github and Rstudio tutorial</a></p></li>
+</ul>
+</div>
+<div id="part-6-statistics" class="section level3">
+<h3>Part 6: Statistics</h3>
+<ul>
+<li><p><a href="https://www.openintro.org/book/os/">OpenIntro Statistics</a> offers a book, videos and R labs in teaching foundational statistics.</p></li>
+<li><p>This <a href="https://www.coursera.org/specializations/statistics#courses">Statistics with R Coursera specialization</a> is also a great resource.</p></li>
+<li><p>This <a href="https://www.edx.org/course/data-analysis-for-social-scientists">Edx Data Analysis for Social Scientists course</a> also covers foundational statistics concepts and how to implement the statistical concepts in R.</p></li>
+<li><p>Datacamp offers basic and advanced statistics/ machine learning courses.*</p></li>
+</ul>
+</div>
+<div id="part-7-machine-learning" class="section level3">
+<h3>Part 7: Machine Learning</h3>
+<p><strong>1. <a href="https://www.edx.org/course/the-analytics-edge">EDX Analytics Edge</a></strong></p>
+<p>This is the course that hooked me to R. It might seem odd that I started with a course that taught machine learning concepts, but I had just come across the terms “Data Science” and “Machine Learning”. The course provided a simple and comprehensive introduction to machine learning alongside R basics such as loading data, data types, summarizing data, subsetting data etc. The course covered the following topics: Linear Regression, Logistic Regression, Decision Trees, Random Forest, Clustering, Linear and Integral Optimization. The lectures were easy to understand, there were code examples to follow along and short questions after each lecture. The assignments at the end of each topic were the best part of the course as they required a learner to actually work on the data provided in order to answer the questions. The questions were accompanied with code examples and questions were ordered sequentially in such a way that learners started with loading data and step by step learnt a piece of code as they answered each question. This course gave me a good understanding of R and machine learning.</p>
+<p><strong>2. Machine Learning with R by Brett Lantz</strong></p>
+<p>This book covers a wide range of machine learning algorithms with simple explanations and step by step code examples. I always refer to this book whenever I need to refresh my knowledge on a machine learning algorithm. The datasets used in the book can be found <a href="https://github.com/stedy/Machine-Learning-with-R-datasets">here</a>.</p>
+<p><strong>3. Machine Learning Projects</strong></p>
+<p>Now that know your way around R and the foundations of machine learning, you need to do projects to grow your skills and to build a portfolio. Some great sources of datasets, tutorials and others’ code include:</p>
+<ul>
+<li><p><a href="https://www.kaggle.com/">Kaggle</a></p></li>
+<li><p><a href="https://datahack.analyticsvidhya.com/?utm_source=feed&amp;utm_medium=navbar">Analytics Vidhya</a></p></li>
+<li><p><a href="https://www.drivendata.org/competitions/">Driven Data</a></p></li>
+<li><p><a href="https://zindi.africa/competitions">Zindi</a></p></li>
+</ul>
+<p>It also good to come up with your own project ideas, get your own datasets and implement your ideas.</p>
+</div>
+<div id="part-8-complementary-tools" class="section level3">
+<h3>Part 8: Complementary Tools</h3>
+<p>As your R career progresses, you need other tools/products to extend your work. Here are some of the tools I regularly use with R:</p>
+<p><strong>1. Relational databases beyond .xls, .xlsx and .csv files</strong></p>
+<p>As your datasets grow and the number of people using those datasets grow, you may need to look beyond .xls, .xlsx and .csv files. I have been using relational databases particularly <strong><a href="https://www.postgresql.org/">Postgres</a></strong>. Alternatives to Postgres include MySQL, Microsoft SQL Server, Oracle etc.</p>
+<p><strong>2. SQL</strong> is a programming language that allows you to interact with relational databases including Postgres. To learn SQL for Postgres use this <a href="https://www.postgresqltutorial.com/">PostgreSQL tutorial</a>.</p>
+<p><strong>3. R SQL packages</strong></p>
+<p>To work with relational databases in R, you need packages that mediate between R and SQL such as DBI, RPostgreSQL and RPostgres for working with Postgres. There are other packages that work with other types of relational databases.</p>
+<p><strong>4. Cloud Platforms as virtual working environments, databases andshiny applications host services</strong></p>
+<p>You can use cloud platforms such as Digital Ocean and AWS EC2 (what I use) to create virtual environments particularly when collaborating with others such that you don’t write code on your local pc, but on the virtual PC. To learn more about this, use this <a href="https://towardsdatascience.com/how-to-run-rstudio-on-aws-in-under-3-minutes-for-free-65f8d0b6ccda">link</a>.</p>
+<p>Rstudio offers a free service shinyapp.io to host shiny applications, but it has limited capabilities. It also offers a premium service called <a href="https://rstudio.com/products/connect/">RStudio Connect</a> - which I am yet to try. You can use cloud platforms such as Digital Ocean and AWS EC2 to host your application. This is my go to <a href="http://www.kimberlycoffey.com/blog/2016/2/13/mlz90wjw0k76446xkg262prvjp0l8u">tutorial on hosting a shiny app on AWS EC2</a>.</p>
+</div>
+<div id="part-9-more-resources" class="section level3">
+<h3>Part 9: More Resources</h3>
+<div id="additional-r-learning-resources" class="section level4">
+<h4>Additional R Learning Resources</h4>
+<ul>
+<li><p>Book: [R for Data Science by Garrett Grolemund and Hadley Wickham] (<a href="https://r4ds.had.co.nz/data-visualisation.html" class="uri">https://r4ds.had.co.nz/data-visualisation.html</a>). Some chapters of this book were already covered under the tidyverse package.</p></li>
+<li><p>Book: <a href="https://adv-r.hadley.nz/">Advanced R by Hadley Wickham</a></p></li>
+<li><p>Book: <a href="https://bookdown.org/rdpeng/rprogdatascience/">R Programming for Data Science</a></p></li>
+<li><p>Search engine</p></li>
+</ul>
+<p>The web will almost always have the answers you are looking for. Whenever you are stuck or you get an error, search the error or task you want to accomplish and you will most likely find an answer. Sites that are extremely valuable and will most likely have the solutions you are looking for include:</p>
+<ul>
+<li><p><a href="https://stackoverflow.com/">Stack Overflow</a></p></li>
+<li><p><a href="https://www.r-bloggers.com/">Rbloggers</a></p></li>
+</ul>
+</div>
+<div id="non-programming-data-science-resources" class="section level4">
+<h4>Non-programming Data Science Resources</h4>
+<ul>
+<li><p>Book: Art of Data Science by Roger D. Peng and Elizabeth Matsui</p></li>
+<li><p>Book: Weapons of Math Destruction by Cathy O’Neil</p></li>
+<li><p><a href="https://www.datacamp.com/community/podcast">Dataframed Podcast</a></p></li>
+<li><p><a href="https://twimlai.com/shows/">TWIML AI Podcast</a></p></li>
+<li><p><a href="https://anchor.fm/dependent-variable">Dependent Variable Podcast</a></p></li>
+</ul>
+</div>
+<div id="global-data-science-communities" class="section level4">
+<h4>Global Data Science Communities</h4>
+<ul>
+<li><p>#rstats - A twitter hashtag to share R questions and tips</p></li>
+<li><p>#Tidytuesday - A twitter hashtag to share R visualizations</p></li>
+<li><p><span class="citation">@rstatstweet</span> - Retweets #rstats stuff</p></li>
+<li><p>R for Data Science Online Learning Community(<a href="https://www.rfordatasci.com/" class="uri">https://www.rfordatasci.com/</a>)</p>
+<p>Twitter: <span class="citation">@R4DSCommunity</span></p>
+<p>[Slack] (<a href="https://rfordatascience.slack.com/join/shared_invite/enQtODExNzUwOTk2MTgyLTBjMmU4MWNmZTdkNzJmNjcwZGMwODIzYjQxZGQ4YjE0NWE2N2NlMGVkMjljYmRlNGRhODliYzg4OTA2ODY3Y2U#/" class="uri">https://rfordatascience.slack.com/join/shared_invite/enQtODExNzUwOTk2MTgyLTBjMmU4MWNmZTdkNzJmNjcwZGMwODIzYjQxZGQ4YjE0NWE2N2NlMGVkMjljYmRlNGRhODliYzg4OTA2ODY3Y2U#/</a>)</p></li>
+<li><p><a href="https://twimlai.com/">TWIML AI</a> - a community of data scientists</p></li>
+</ul>
+</div>
+<div id="kenyan-data-science-communities" class="section level4">
+<h4>Kenyan Data Science Communities</h4>
+<ul>
+<li><p>Nairobi Women in Machine Learning</p>
+<p>Meetup: <a href="https://www.meetup.com/Nairobi-Women-in-Machine-Learning-Data-Science/" class="uri">https://www.meetup.com/Nairobi-Women-in-Machine-Learning-Data-Science/</a></p></li>
+</ul>
+<p><em>Nairobi Women in Machine Learning offers a community based learning program dubbed R Master Cohort Class</em></p>
+<ul>
+<li><p>AI Saturdays</p>
+<p>Meetup: <a href="https://www.meetup.com/AI-Saturdays-Nairobi/" class="uri">https://www.meetup.com/AI-Saturdays-Nairobi/</a></p></li>
+<li><p>AI Kenya</p>
+<p>Twitter: <span class="citation">@AiKenya1</span></p>
+<p>Telegram: <a href="https://t.me/AIKENYA" class="uri">https://t.me/AIKENYA</a></p>
+<p>Meetup: <a href="https://www.meetup.com/Ai-Kenya/" class="uri">https://www.meetup.com/Ai-Kenya/</a></p></li>
+<li><p>NairobiR</p>
+<p>Twitter: #NairobiR</p></li>
+<li><p>Python Kenya</p>
+<p>Telegram: <a href="https://t.me/pythonKE" class="uri">https://t.me/pythonKE</a></p>
+<p>Meetup:<a href="https://www.meetup.com/Python-Nairobi/" class="uri">https://www.meetup.com/Python-Nairobi/</a></p></li>
+<li><p>Geospatial Advocacy Kenya</p>
+<p>Meetup: <a href="https://www.meetup.com/Geospatial-Advocacy-Kenya/" class="uri">https://www.meetup.com/Geospatial-Advocacy-Kenya/</a></p>
+<p>Website: <a href="https://geospatialadvocacy.co.ke/" class="uri">https://geospatialadvocacy.co.ke/</a></p></li>
+</ul>
+</div>
+<div id="non-programming-tools" class="section level4">
+<h4>Non-programming tools</h4>
+<ul>
+<li><p><a href="https://justgetflux.com/">Flux</a>: To automatically control your screen brightness according to waking and sleeping time:</p></li>
+<li><p><a href="https://app.getpocket.com/">Pocket</a>: To save links to resources you like for later reading</p></li>
+<li><p><a href="">Cold Turkey</a>: To block distracting websites during your learning/working time.</p></li>
+<li><p>Alarm clock/Timer of your choice: To remind you to take regular physical breaks to keep away neck and back aches: Alarm clock of your choice</p></li>
+</ul>
+</div>
+<div id="the-end" class="section level4">
+<h4>The end</h4>
+<p>In this post, I have shared the resources that I found valuable in my R learning journey. However, there are a lot of resources and lot of learning paths, find what works for you and stick with it. All the best in learning R.</p>
+</div>
+</div>

@@ -1,0 +1,296 @@
+---
+title: "Getting Started With R"
+author: "Florence Muriuki"
+date: '2020-04-15'
+description: ''
+slug: my-experience-getting-started-with-r
+tags: []
+categories: How to
+topics: []
+output:
+  blogdown::html_page:
+    toc: true
+
+---
+
+#### Introduction
+
+*In this post, I describe the things I have learnt to do in R and the resources that I used. There is no particular path to follow when learning a programming language, but in this article I will sequence the learning in a way that makes sense in retrospect.
+*
+
+
+### Part 1: Setting Up
+
+We learn programming by doing. The first few times you copy what someone else is doing, with time you are able to write code from memory and eventually you are able to combine the various things you know to create solutions for your specific problems. There are two main ways to learn R by programming:
+
+**1. Using online platforms that allow you to type code and see results.** All you need is internet connection and a user account.
+
+One such platform is [Datacamp](https://www.datacamp.com/) and it offers beginner courses. You can be able to access a few courses and topics for free, but you need a paid subscription to access all courses and topics. Datacamp offers an [introduction to R course](https://www.datacamp.com/courses/free-introduction-to-r). Another online learning platform is [Codecademy](https://www.codecademy.com/) and it offers this [introduction to R course](https://www.codecademy.com/learn/learn-r). You can certainly find other online learning platforms on the web.
+
+
+**2. Install and use R on your computer**. This might be a good choice for someone without continous internet connection and who prefers unlimited freedom when learning. This is the method I used and still use.
+
+To install R, all you need is a basic computer. I started out with a 2GB RAM laptop and limited storage.I had a smooth learning experience as R is a light program particularly when running a few lines of code on a small dataset. Use what you have.
+
+R comes with its own interface/editor called R GUI, however I recommend installing RStudio - a more beautiful interface with way better user experience- immediately after installing R. To install R, go to this [R page](https://www.r-project.org/) and to install Rstudio, go to this [Rstudio page](https://rstudio.com/products/rstudio/download/). If you need step by step instructions on the installation processes, use this [Datacamp guide](https://www.datacamp.com/community/tutorials/installing-R-windows-mac-ubuntu). Once R and Rstudio are successfully installed, you are ready to code as you learn.
+
+
+### Part 2: R Basics
+
+Below is a list of some basics to cover:
+
+* Data types
+
+* Loading data
+
+* Quickly understanding the data you have
+
+* Subsetting data
+
+* Plotting
+
+* Saving data
+
+* Importing packages
+
+* Functions
+
+
+Some good resources to cover the above basics include:
+
+1. [Cran Introduction to R pdf](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) chapters 1 to 10, chapter 13
+
+2. [Swirl](https://swirlstats.com/) is a good learning package that teaches you as you go along (an offline alternative to Datacamp and the likes). To get started with swirl, use this 
+[guide](https://swirlstats.com/students.html).
+
+3. For those who prefer video lectures,  [Data Science: Foundations using R Specialization](https://www.coursera.org/specializations/data-science-foundations-r#courses) is a great resource that starts from basics.
+
+4. For those who prefer online learning platforms like Datacamp and Codecademy, you can find various introductory courses on your preferred platforms.
+
+
+### Part 3: R packages to take you beyond the basics
+
+![](/post/2020-04-15-my-experience-getting-started-with-r_files/tidyverse.PNG){width=200px height=200px}
+
+R packages are smaller programs that extend the power of R. In this section, I cover packages that I almost always use in data analysis projects and links to some helpful resources: 
+
+* Package to read csv, tsv and fwf files: [readr](https://readr.tidyverse.org/) 
+
+* Package to read .xls/.xlsx files: [readxl](https://readxl.tidyverse.org/)
+
+* Package that offers an alternative data type to Data Frame: [tibble](https://r4ds.had.co.nz/tibbles.html)
+
+* Package to work with data at data analysis stage: [dplyr](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html)
+
+* Package to tidy and reshape data: [tidyr](https://r4ds.had.co.nz/tidy-data.html)
+
+* Package to create beautiful visualizations: [ggplot2](http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html) read through all the 3 blog posts
+
+* Package to work with date columns: [lubridate](https://r4ds.had.co.nz/dates-and-times.html)
+
+* Package to work with text data: [stringr](https://r4ds.had.co.nz/strings.html)
+
+The aforementioned Intro to R swirl course also covers some of these packages.
+
+readr, tibble, dplyr, tidyr and stringr are some of the packages in a collection of packages  known as Tidyverse. 
+
+I use Tidyverse, but there is an alternative package known as **data.table**. Some resources to learn data.table include:
+
+* https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/
+
+* https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+
+* https://www.r-bloggers.com/intro-to-the-data-table-package/
+
+
+You can learn either tidyverse, data.table or both.
+
+
+### Part 4: More advanced and task specific packages
+
+**Rmarkdown** allows you to combine normal text and code. It comes in handy when you want to include explanations to your code, visualizations and analysis outputs. It is what I have used to write this blog post. Rstudio offers great [Rmarkdown learning resources here](https://rmarkdown.rstudio.com/lesson-1.html).
+
+
+**Shiny** allows you to create web applications with limited knowledge of HTML and Javascript. It comes in handy when you want others to interact with the product of your code without them knowing or installing R. The most common use of Shiny, I have seen, is creating interactive dashboards. Rstudio provides [shiny examples here](https://shiny.rstudio.com/gallery/) and great [shiny learning resources here](https://shiny.rstudio.com/tutorial/).
+
+
+**Rvest** allows you to scrape data from the web. A great [rvest learning resource is here](https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/).
+
+
+**Blogdown** allows you to create blog posts like this one in R. Blogdown works with Github to store your code and hosting services such as Netlify to host your blog. This article guides you on [how to use blogdown to create your blog with blogdown](https://alison.rbind.io/post/2017-06-12-up-and-running-with-blogdown/). It would help to be familiar with Github before learning blogdown.
+
+### Part 5: Git and Github/Gitlab
+
+Git is a versioning tool that keeps track of the changes you make to your code. Github and Gitlab are examples of code repositories that allow you to store and share your code online. To learn how to use Rstudio with Git and Github, use the following resources:
+
+* [A book: Happy Git and GitHub for the useR](https://happygitwithr.com/)
+
+* [A github and Rstudio tutorial](https://www.r-bloggers.com/rstudio-and-github/)
+
+
+### Part 6: Statistics
+
+* [OpenIntro Statistics](https://www.openintro.org/book/os/) offers a book, videos and R labs in teaching foundational statistics.
+
+* This [Statistics with R Coursera    specialization](https://www.coursera.org/specializations/statistics#courses) is also a great resource.
+
+* This [Edx Data Analysis for Social Scientists course](https://www.edx.org/course/data-analysis-for-social-scientists) also covers foundational statistics concepts and how to implement the statistical concepts in R.
+
+* Datacamp offers basic and advanced statistics/ machine learning courses.*
+
+
+### Part 7: Machine Learning
+
+**1. [EDX Analytics Edge](https://www.edx.org/course/the-analytics-edge)**
+
+This is the course that hooked me to R. It might seem odd that I started with a course that taught machine learning concepts, but I had just come across the terms "Data Science" and "Machine Learning". The course provided a simple and comprehensive introduction to machine learning alongside R basics such as loading data, data types, summarizing data, subsetting data etc. The course covered the following topics: Linear Regression, Logistic Regression, Decision Trees, Random Forest, Clustering, Linear and Integral Optimization. The lectures were easy to understand, there were code examples to follow along and short questions after each lecture. The assignments at the end of each topic were the best part of the course as they required a learner to actually work on the data provided in order to answer the questions. The questions were accompanied with code examples and questions were ordered sequentially in such a way that learners started with loading data and step by step learnt a piece of code as they answered each question. This course gave me a good understanding of R and machine learning.
+
+
+**2. Machine Learning with R by Brett Lantz**
+
+This book covers a wide range of machine learning algorithms with simple explanations and step by step code examples. I always refer to this book whenever I need to refresh my knowledge on a machine learning algorithm. The datasets used in the book can be found [here](https://github.com/stedy/Machine-Learning-with-R-datasets).
+
+**3. Machine Learning Projects**
+
+Now that know your way around R and the foundations of machine learning, you need to do projects to grow your skills and to build a portfolio. Some great sources of datasets, tutorials and others' code include:
+
+* [Kaggle](https://www.kaggle.com/)
+
+* [Analytics Vidhya](https://datahack.analyticsvidhya.com/?utm_source=feed&utm_medium=navbar)
+
+* [Driven Data](https://www.drivendata.org/competitions/)
+
+* [Zindi](https://zindi.africa/competitions)
+
+It also good to come up with your own project ideas, get your own datasets and implement your ideas.
+
+### Part 8: Complementary Tools
+
+As your R career progresses, you need other tools/products to extend your work. Here are some of the tools I regularly use with R:
+
+**1. Relational databases beyond .xls, .xlsx and .csv files**
+
+As your datasets grow and the number of people using those datasets grow, you may need to look beyond .xls, .xlsx and .csv files. I have been using relational databases particularly **[Postgres](https://www.postgresql.org/)**. Alternatives to Postgres include MySQL, Microsoft SQL Server, Oracle etc.
+
+**2. SQL** is a programming language that allows you to interact with relational databases including Postgres. To learn SQL for Postgres use this [PostgreSQL tutorial](https://www.postgresqltutorial.com/).
+
+**3. R SQL packages**
+
+To work with relational databases in R, you need packages that mediate between R and SQL such as DBI, RPostgreSQL and RPostgres for working with Postgres. There are other packages that work with other types of relational databases.
+
+**4. Cloud Platforms as virtual working environments, databases  andshiny applications host services**
+
+You can use cloud platforms such as Digital Ocean and AWS EC2 (what I use) to create virtual environments particularly when collaborating with others such that you don't write code on your local pc, but on the virtual PC. To learn more about this, use this [link](https://towardsdatascience.com/how-to-run-rstudio-on-aws-in-under-3-minutes-for-free-65f8d0b6ccda).
+
+Rstudio offers a free service shinyapp.io to host shiny applications, but it has limited capabilities. It also offers a premium service called [RStudio Connect](https://rstudio.com/products/connect/) - which I am yet to try. You can use cloud platforms such as Digital Ocean and AWS EC2 to host your application. This is my go to [tutorial on hosting a shiny app on AWS EC2](http://www.kimberlycoffey.com/blog/2016/2/13/mlz90wjw0k76446xkg262prvjp0l8u).
+
+### Part 9: More Resources
+
+#### Additional R Learning Resources
+
+* Book: [R for Data Science by Garrett Grolemund and Hadley Wickham] (https://r4ds.had.co.nz/data-visualisation.html). Some chapters of this book were already covered under the tidyverse package.
+
+* Book: [Advanced R by Hadley Wickham](https://adv-r.hadley.nz/)
+
+* Book: [R Programming for Data Science](https://bookdown.org/rdpeng/rprogdatascience/)
+
+* Search engine
+
+The web will almost always have the answers you are looking for. Whenever you are stuck or you get an error, search the error or task you want to accomplish and you will most likely find an answer. Sites that are extremely valuable and will most likely have the solutions you are looking for include:
+
+* [Stack Overflow](https://stackoverflow.com/)
+        
+* [Rbloggers](https://www.r-bloggers.com/)
+        
+        
+#### Non-programming Data Science Resources
+
+* Book: Art of Data Science by Roger D. Peng and Elizabeth Matsui
+
+* Book: Weapons of Math Destruction by Cathy O'Neil
+
+* [Dataframed Podcast](https://www.datacamp.com/community/podcast)
+
+* [TWIML AI Podcast](https://twimlai.com/shows/)
+
+* [Dependent Variable Podcast](https://anchor.fm/dependent-variable)
+
+
+#### Global Data Science Communities 
+
+* #rstats - A twitter hashtag to share R questions and tips
+ 
+* #Tidytuesday - A twitter hashtag to share R visualizations
+
+* @rstatstweet - Retweets #rstats stuff
+
+* R for Data Science Online Learning Community(https://www.rfordatasci.com/) 
+
+     Twitter: @R4DSCommunity
+     
+     [Slack] (https://rfordatascience.slack.com/join/shared_invite/enQtODExNzUwOTk2MTgyLTBjMmU4MWNmZTdkNzJmNjcwZGMwODIzYjQxZGQ4YjE0NWE2N2NlMGVkMjljYmRlNGRhODliYzg4OTA2ODY3Y2U#/)
+     
+* [TWIML AI](https://twimlai.com/) - a community of data scientists
+
+
+#### Kenyan Data Science Communities
+
+* Nairobi Women in Machine Learning 
+  
+  Meetup: https://www.meetup.com/Nairobi-Women-in-Machine-Learning-Data-Science/
+
+*Nairobi Women in Machine Learning offers a community based learning program dubbed R Master Cohort Class*
+
+* AI Saturdays
+  
+  Meetup: https://www.meetup.com/AI-Saturdays-Nairobi/
+
+* AI Kenya
+  
+   Twitter: @AiKenya1
+  
+   Telegram: https://t.me/AIKENYA
+  
+   Meetup: https://www.meetup.com/Ai-Kenya/
+
+* NairobiR
+
+  Twitter: #NairobiR
+  
+* Python Kenya
+
+  Telegram: https://t.me/pythonKE
+  
+  Meetup:https://www.meetup.com/Python-Nairobi/
+  
+
+* Geospatial Advocacy Kenya
+
+  Meetup: https://www.meetup.com/Geospatial-Advocacy-Kenya/
+  
+  Website: https://geospatialadvocacy.co.ke/
+  
+
+#### Non-programming tools
+
+* [Flux](https://justgetflux.com/): To automatically control your screen brightness according to waking and sleeping time: 
+
+* [Pocket](https://app.getpocket.com/): To save links to resources you like for later reading
+
+* [Cold Turkey](): To block distracting websites during your learning/working time.
+
+* Alarm clock/Timer of your choice: To remind you to take regular physical breaks to keep away neck and back aches: Alarm clock of your choice
+
+
+
+#### The end 
+
+In this post, I have shared the resources that I found valuable in my R learning journey. However, there are a lot of resources and lot of learning paths, find what works for you and stick with it. All the best in learning R.
+
+
+
+
+
+
+
+
