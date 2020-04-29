@@ -1,16 +1,13 @@
 ---
-title: "Getting Started With R"
-author: "Florence Muriuki"
+title: Getting Started With R
+author: Florence Muriuki
 date: '2020-04-15'
-description: ''
+categories:
+  - How to
 slug: my-experience-getting-started-with-r
-tags: []
-categories: How to
-topics: []
 output:
   blogdown::html_page:
-    toc: true
-
+    toc: yes
 ---
 
 #### Introduction
@@ -69,6 +66,8 @@ Some good resources to cover the above basics include:
 
 
 ### Part 3: R packages to take you beyond the basics
+
+![](/post/2020-04-15-my-experience-getting-started-with-r_files/tidyverse.PNG){width=200px height=200px}
 
 R packages are smaller programs that extend the power of R. In this section, I cover packages that I almost always use in data analysis projects and links to some helpful resources: 
 
