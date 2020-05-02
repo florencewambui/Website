@@ -18,7 +18,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   subtitle = "Everyday Data Science"
   brand = "Wambui"
   #googleAnalytics = "Your Google Analytics tracking ID"
-  #disqus = "Your Disqus shortname"
+  disqus = "https-florence-muriuki-netlify-app"
   # CSS name for highlight.js
   highlightjs = "androidstudio"
   dateFormat = "02 Jan 2006, 15:04"
